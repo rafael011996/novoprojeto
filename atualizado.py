@@ -1,26 +1,46 @@
 import pandas as pd
 import streamlit as st
+import requests
 
 st.set_page_config(page_title="Consultas TRIUNFANTE", layout="wide")
 
-# Funções para carregar os dados
+# URLs das planilhas
+sheet_id_cargas = 'SEU_ID_AQUI'  # <-- Substitua pelo ID real
+sheet_url = f'https://docs.google.com/spreadsheets/d/{sheet_id_cargas}/gviz/tq?tqx=out:csv&sheet='
+
+# Abas da interface
+st.title("Consultas TRIUNFANTE")
+abas = st.tabs(["📥 Consulta de Entradas", "📦 Consulta de Produtos", "🚚 Consulta de Cargas"])
+
+# Entradas
 @st.cache_data(ttl=0)
 def carregar_dados_entradas():
-    url = 'https://raw.githubusercontent.com/rafael011996/novoprojeto/main/consultaentrada.csv'
+    url = 'https://raw.githubusercontent.com/rafael011996/consultaentrada/main/consultaentrada.csv'
     return pd.read_csv(url, delimiter=';', encoding='utf-8')
 
+# Produtos
 @st.cache_data(ttl=0)
 def carregar_dados_produtos():
-    url = 'https://raw.githubusercontent.com/rafael011996/novoprojeto/main/produtos.csv'
+    url = 'https://raw.githubusercontent.com/rafael011996/consulta/main/produtos.csv'
     return pd.read_csv(url, delimiter=';', encoding='utf-8')
 
+# Cargas
+@st.cache_data(ttl=0)
+def carregar_dados_cargas(sheet_id):
+    # Lista de abas conhecidas — você pode atualizar se mudar
+    abas = ['Aba1', 'Aba2', 'Aba3']  # <-- Substitua com os nomes reais das abas
+    frames = []
+    for aba in abas:
+        try:
+            url = f'https://docs.google.com/spreadsheets/d/{sheet_id}/gviz/tq?tqx=out:csv&sheet={aba}'
+            df = pd.read_csv(url)
+            df['Aba'] = aba  # Marcar de qual aba veio
+            frames.append(df)
+        except Exception as e:
+            st.warning(f"Erro ao carregar aba {aba}: {e}")
+    return pd.concat(frames, ignore_index=True) if frames else pd.DataFrame()
 
-# Interface do app
-st.title("Consultas TRIUNFANTE")
-
-abas = st.tabs(["📥 Consulta de Entradas", "📦 Consulta de Produtos"])
-
-# Aba: Consulta de Entradas
+# Aba 1: Entradas
 with abas[0]:
     st.subheader("Consulta de Entradas")
     dados_entradas = carregar_dados_entradas()
@@ -39,7 +59,7 @@ with abas[0]:
         else:
             st.warning('Nenhum resultado encontrado.')
 
-# Aba: Consulta de Produtos
+# Aba 2: Produtos
 with abas[1]:
     st.subheader("Consulta de Produtos")
     dados_produtos = carregar_dados_produtos()
@@ -58,3 +78,20 @@ with abas[1]:
             st.dataframe(resultado)
         else:
             st.warning('Nenhum produto encontrado.')
+
+# Aba 3: Cargas
+with abas[2]:
+    st.subheader("Consulta de Cargas")
+    num_carga = st.text_input("Digite o número da carga:", key="carga")
+
+    if num_carga:
+        dados_cargas = carregar_dados_cargas(sheet_id_cargas)
+        if dados_cargas.empty:
+            st.error("Nenhuma carga encontrada ou erro ao carregar planilha.")
+        else:
+            resultado = dados_cargas[dados_cargas.iloc[:, 3].astype(str).str.contains(num_carga)]
+            if not resultado.empty:
+                st.write("Resultado da consulta:")
+                st.dataframe(resultado.iloc[:, 4:9])  # Colunas E a I
+            else:
+                st.warning("Nenhuma carga encontrada com esse número.")
