@@ -27,18 +27,18 @@ def carregar_dados_produtos():
 # Cargas
 @st.cache_data(ttl=0)
 def carregar_dados_cargas(sheet_id):
-    # Lista de abas conhecidas — você pode atualizar se mudar
-    abas = ['Aba1', 'Aba2', 'Aba3']  # <-- Substitua com os nomes reais das abas
+    abas = ['ABRIL/2025']  # <- use os nomes reais das abas (você pode ter mais de um)
     frames = []
     for aba in abas:
         try:
-            url = f'https://docs.google.com/spreadsheets/d/1TKCyEJ76ESHNTuczB0wMrnc_8z8j3_1LmR6Z9VnlZ7E/edit?usp=sharing'
+            url = f'https://docs.google.com/spreadsheets/d/{sheet_id}/gviz/tq?tqx=out:csv&sheet={aba}'
             df = pd.read_csv(url)
-            df['ABRIL/2025'] = aba  # Marcar de qual aba veio
+            df['ABA'] = aba
             frames.append(df)
         except Exception as e:
             st.warning(f"Erro ao carregar aba {aba}: {e}")
     return pd.concat(frames, ignore_index=True) if frames else pd.DataFrame()
+
 
 # Aba 1: Entradas
 with abas[0]:
