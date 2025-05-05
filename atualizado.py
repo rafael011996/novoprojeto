@@ -39,7 +39,6 @@ def carregar_dados_cargas(sheet_id):
             st.warning(f"Erro ao carregar aba {aba}: {e}")
     return pd.concat(frames, ignore_index=True) if frames else pd.DataFrame()
 
-
 # Aba 1: Entradas
 with abas[0]:
     st.subheader("Consulta de Entradas")
@@ -91,7 +90,11 @@ with abas[2]:
         else:
             resultado = dados_cargas[dados_cargas.iloc[:, 3].astype(str).str.contains(num_carga)]
             if not resultado.empty:
-                st.write("Resultado da consulta:")
-                st.dataframe(resultado.iloc[:, 4:9])  # Colunas E a I
+    resultado_formatado = resultado.iloc[:, 4:9].copy()
+    resultado_formatado.columns = ['Status', 'Motorista', 'Emissão', 'Saída', 'Expedido']
+    
+    st.write("Resultado da consulta:")
+    st.dataframe(resultado_formatado, use_container_width=True)
+
             else:
                 st.warning("Nenhuma carga encontrada com esse número.")
