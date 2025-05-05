@@ -110,7 +110,7 @@ with abas[2]:
 
                     if dados_cargas.shape[1] >= 1:
                         resultado = dados_cargas[dados_cargas.iloc[:, 4].astype(str).str.contains(num_carga, na=False)]
-                        colunas_exibir = dados_cargas.columns[1:11]
+                        colunas_exibir = dados_cargas.columns[1:2]
                     else:
                         st.warning("A planilha MCD não tem colunas suficientes para a consulta.")
                         resultado = pd.DataFrame()
