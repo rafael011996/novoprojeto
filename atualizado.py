@@ -109,18 +109,18 @@ with abas[2]:
         if tipo_carga == "CARGAS MCD":
             print(dados_cargas.iloc[:, 4].astype(str).head()) # Imprime as primeiras linhas da coluna
             resultado = dados_cargas[dados_cargas.iloc[:, 4].astype(str).str.contains(num_carga, na=False)]
-            colunas_exibir = dados_cargas.columns[2:9]
+            colunas_exibir = [4, 5, 7, 8, 9, 10]  # Índices das colunas E, F, H, I, J, K
             if not resultado.empty:
                 st.success("Resultado da consulta:")
-                st.dataframe(resultado.loc[:, colunas_exibir])
+                st.dataframe(resultado.iloc[:, colunas_exibir])
             else:
                 st.warning("Nenhuma carga encontrada com esse número.")
         elif tipo_carga == "CARGAS TCG":
             resultado = dados_cargas[dados_cargas.iloc[:, 3].astype(str).str.contains(num_carga, na=False)]
-            colunas_exibir = dados_cargas.columns[2:9]
+            colunas_exibir = [2, 3, 5, 6, 7, 8] # Ajuste conforme as colunas desejadas para TCG
             if not resultado.empty:
                 st.success("Resultado da consulta:")
-                st.dataframe(resultado.loc[:, colunas_exibir])
+                st.dataframe(resultado.iloc[:, colunas_exibir])
             else:
                 st.warning("Nenhuma carga encontrada com esse número.")
     else:
