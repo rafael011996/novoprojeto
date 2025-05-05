@@ -105,7 +105,7 @@ with abas[2]:
                     colunas_exibir = dados_cargas.columns[3:9]
 
                 elif tipo_carga == "CARGAS MCD":
-                    dados_cargas = dados_cargas[dados_cargas.iloc[:, 0] != 'REGIÃO']
+                    dados_cargas = dados_cargas[dados_cargas.iloc[:, 4] != 'ID CARGA']
                     dados_cargas = dados_cargas.reset_index(drop=True)
 
                     if dados_cargas.shape[1] >= 6:
