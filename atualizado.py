@@ -101,7 +101,7 @@ with abas[2]:
     else:
         abas_meses = ['04/ABRIL', '05/MAIO']
         sheet_id = sheet_id_cargas_mcd
-        colunas_exibir_mcd = [4, 5, 7, 8, 9, 10] # Índices das colunas E, F, H, I, J, K
+        colunas_exibir_mcd = [4, 5, 6, 7] # Índices para CARGA, DIA, Unnamed: 6, ABA
 
     dados_cargas = carregar_dados_cargas(sheet_id, abas_meses)
 
