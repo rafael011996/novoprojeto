@@ -92,9 +92,7 @@ with abas[2]:
             if not resultado.empty:
     resultado_formatado = resultado.iloc[:, 4:9].copy()
     resultado_formatado.columns = ['Status', 'Motorista', 'Emissão', 'Saída', 'Expedido']
-    
     st.write("Resultado da consulta:")
     st.dataframe(resultado_formatado, use_container_width=True)
-
-            else:
-                st.warning("Nenhuma carga encontrada com esse número.")
+else:
+    st.warning("Nenhuma carga encontrada com esse número.")
