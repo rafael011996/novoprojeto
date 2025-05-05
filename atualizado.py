@@ -89,8 +89,10 @@ with abas[2]:
 
     sheet_id = sheet_id_cargas_tcg if tipo_carga == "CARGAS TCG" else sheet_id_cargas_mcd
 
-    if num_carga:
-        dados_cargas = carregar_dados_cargas(sheet_id, abas_meses)
+    dados_cargas = pd.DataFrame() # Inicializa dados_cargas com um DataFrame vazio
+
+if num_carga:
+    dados_cargas = carregar_dados_cargas(sheet_id, abas_meses)
     if dados_cargas.empty:
         st.error("Nenhuma carga encontrada ou erro ao carregar planilha.")
     else:
@@ -100,21 +102,25 @@ with abas[2]:
 
             if tipo_carga == "CARGAS TCG":
                 resultado = dados_cargas[dados_cargas.iloc[:, 3].astype(str).str.contains(num_carga, na=False)]
-                colunas_exibir = slice(4, 9)  # Colunas E a I
-            else:  # CARGAS MCD
+                colunas_exibir = slice(4, 9) # Colunas E a I
+            else: # CARGAS MCD
                 if dados_cargas.shape[1] >= 11:
                     resultado = dados_cargas[dados_cargas.iloc[:, 4].astype(str).str.contains(num_carga, na=False)]
-                    colunas_exibir = [4, 5, 7, 8, 9, 10]  # Colunas E, F, H, I, J, K
+                    colunas_exibir = [4, 5, 6, 7, 8, 9, 10] # Colunas E, F, G, H, I, J, K
                 else:
                     st.warning("A planilha MCD não tem colunas suficientes.")
                     resultado = pd.DataFrame()
 
             if not resultado.empty:
                 st.success("Resultado da consulta:")
-                st.dataframe(resultado.iloc[:, colunas_exibir])
+                st.dataframe(resultado.loc[:, colunas_exibir])
             else:
                 st.warning("Nenhuma carga encontrada com esse número.")
         except Exception as e:
             st.error(f"Erro ao processar dados da planilha: {e}")
+else:
+    st.warning("Nenhuma carga encontrada com esse número.")
+except Exception as e:
+    st.error(f"Erro ao processar dados da planilha: {e}")
 
 
