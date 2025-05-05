@@ -97,21 +97,25 @@ if num_carga:
         st.error("Nenhuma carga encontrada ou erro ao carregar planilha.")
     else:
         try:
-            # Remove linhas com menos de 11 colunas válidas (para evitar erro de índice)
-            dados_cargas = dados_cargas.dropna(thresh=11)
+            # Exibindo o cabeçalho da planilha para debugar
+            st.write("Cabeçalho da planilha carregada:", dados_cargas.columns.tolist())
+            
+            # Verifica se a planilha tem ao menos 11 colunas
+            if dados_cargas.shape[1] < 11:
+                st.warning(f"A planilha MCD não tem colunas suficientes para a consulta. Ela tem {dados_cargas.shape[1]} colunas.")
+                resultado = pd.DataFrame()
+            else:
+                # Remove linhas com menos de 11 colunas válidas (para evitar erro de índice)
+                dados_cargas = dados_cargas.dropna(thresh=11)
 
-            if tipo_carga == "CARGAS TCG":
-                resultado = dados_cargas[dados_cargas.iloc[:, 3].astype(str).str.contains(num_carga, na=False)]
-                # Usando fatiamento correto nas colunas
-                colunas_exibir = dados_cargas.columns[3:9]  # Colunas E a I
-            else:  # CARGAS MCD
-                if dados_cargas.shape[1] >= 11:
-                    resultado = dados_cargas[dados_cargas.iloc[:, 5].astype(str).str.contains(num_carga, na=False)]
+                if tipo_carga == "CARGAS TCG":
+                    resultado = dados_cargas[dados_cargas.iloc[:, 3].astype(str).str.contains(num_carga, na=False)]
+                    # Usando fatiamento correto nas colunas
+                    colunas_exibir = dados_cargas.columns[3:9]  # Colunas E a I
+                else:  # CARGAS MCD
+                    resultado = dados_cargas[dados_cargas.iloc[:, 4].astype(str).str.contains(num_carga, na=False)]
                     # Usando fatiamento correto para as colunas de CARGAS MCD
-                    colunas_exibir = dados_cargas.columns[5:11]  # Colunas E, F, G, H, I, J, K
-                else:
-                    st.warning("A planilha MCD não tem colunas suficientes para a consulta.")
-                    resultado = pd.DataFrame()
+                    colunas_exibir = dados_cargas.columns[4:11]  # Colunas E, F, G, H, I, J, K
 
             if not resultado.empty:
                 st.success("Resultado da consulta:")
