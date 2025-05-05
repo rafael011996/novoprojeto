@@ -32,9 +32,9 @@ def carregar_dados_cargas(sheet_id):
     frames = []
     for aba in abas:
         try:
-            url = f'https://docs.google.com/spreadsheets/d/{sheet_id}/gviz/tq?tqx=out:csv&sheet={aba}'
+            url = f'https://docs.google.com/spreadsheets/d/1TKCyEJ76ESHNTuczB0wMrnc_8z8j3_1LmR6Z9VnlZ7E/edit?usp=sharing'
             df = pd.read_csv(url)
-            df['Aba'] = aba  # Marcar de qual aba veio
+            df['ABRIL/2025'] = aba  # Marcar de qual aba veio
             frames.append(df)
         except Exception as e:
             st.warning(f"Erro ao carregar aba {aba}: {e}")
