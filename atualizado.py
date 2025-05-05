@@ -97,11 +97,11 @@ with abas[2]:
     if tipo_carga == "CARGAS TCG":
         abas_meses = ['ABRIL/2025', 'MAIO/2025']
         sheet_id = sheet_id_cargas_tcg
-        colunas_exibir_tcg = [2, 3, 5, 6, 7, 8]  # Ajuste para as colunas desejadas de TCG (C, D, F, G, H, I)
+        colunas_exibir_tcg = [2, 3, 4, 5, 6, 7, 8]  # Ajuste para as colunas desejadas de TCG (C, D, F, G, H, I)
     else:
         abas_meses = ['04/ABRIL', '05/MAIO']
         sheet_id = sheet_id_cargas_mcd
-        colunas_exibir_mcd = [4, 5, 6, 7] # Índices para CARGA, DIA, Unnamed: 6, ABA
+        colunas_exibir_mcd = [4] # Índices para CARGA, DIA, Unnamed: 6, ABA
 
     dados_cargas = carregar_dados_cargas(sheet_id, abas_meses)
 
