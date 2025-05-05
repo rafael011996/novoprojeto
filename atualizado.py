@@ -1,33 +1,29 @@
 import pandas as pd
 import streamlit as st
-import requests
 
 st.set_page_config(page_title="Consultas TRIUNFANTE", layout="wide")
 
-# URLs das planilhas
-sheet_id_cargas = '1TKCyEJ76ESHNTuczB0wMrnc_8z8j3_1LmR6Z9VnlZ7E'  # <-- Substitua pelo ID real
-sheet_url = f'https://docs.google.com/spreadsheets/d/1TKCyEJ76ESHNTuczB0wMrnc_8z8j3_1LmR6Z9VnlZ7E/edit?usp=sharing'
+# IDs das planilhas
+sheet_id_cargas_tcg = '1TKCyEJ76ESHNTuczB0wMrnc_8z8j3_1LmR6Z9VnlZ7E'  # Planilha TCG
+sheet_id_cargas_mcd = '1xlc9vqgg6PwqMAu7-pzQ1VM_ElxDqGNPYFWk8zRXuiE'  # Substitua pelo ID da MCD
 
 # Abas da interface
 st.title("Consultas TRIUNFANTE")
 abas = st.tabs(["📥 Consulta de Entradas", "📦 Consulta de Produtos", "🚚 Consulta de Cargas"])
 
-# Entradas
+# Funções de carregamento
 @st.cache_data(ttl=0)
 def carregar_dados_entradas():
     url = 'https://raw.githubusercontent.com/rafael011996/consultaentrada/main/consultaentrada.csv'
     return pd.read_csv(url, delimiter=';', encoding='utf-8')
 
-# Produtos
 @st.cache_data(ttl=0)
 def carregar_dados_produtos():
     url = 'https://raw.githubusercontent.com/rafael011996/consulta/main/produtos.csv'
     return pd.read_csv(url, delimiter=';', encoding='utf-8')
 
-# Cargas
 @st.cache_data(ttl=0)
-def carregar_dados_cargas(sheet_id):
-    abas = ['ABRIL/2025']  # <- use os nomes reais das abas (você pode ter mais de um)
+def carregar_dados_cargas(sheet_id, abas):
     frames = []
     for aba in abas:
         try:
@@ -81,18 +77,28 @@ with abas[1]:
 # Aba 3: Cargas
 with abas[2]:
     st.subheader("Consulta de Cargas")
+
+    tipo_carga = st.radio("Selecione o tipo de carga:", ["CARGAS TCG", "CARGAS MCD"])
     num_carga = st.text_input("Digite o número da carga:", key="carga")
 
+    abas_meses = ['ABRIL/2025', 'MAIO/2025']  # Adicione aqui os meses que quiser consultar
+
+    if tipo_carga == "CARGAS TCG":
+        sheet_id = sheet_id_cargas_tcg
+    else:
+        sheet_id = sheet_id_cargas_mcd
+
     if num_carga:
-        dados_cargas = carregar_dados_cargas(sheet_id_cargas)
+        dados_cargas = carregar_dados_cargas(sheet_id, abas_meses)
         if dados_cargas.empty:
             st.error("Nenhuma carga encontrada ou erro ao carregar planilha.")
         else:
-            resultado = dados_cargas[dados_cargas.iloc[:, 3].astype(str).str.contains(num_carga)]
-            if not resultado.empty:
-                st.write("Resultado da consulta:")
-                st.dataframe(resultado.iloc[:, 4:9])  # Colunas E a I
-            else:
-                st.warning("Nenhuma carga encontrada com esse número.")
-
-
+            try:
+                resultado = dados_cargas[dados_cargas.iloc[:, 3].astype(str).str.contains(num_carga)]
+                if not resultado.empty:
+                    st.write("Resultado da consulta:")
+                    st.dataframe(resultado.iloc[:, 4:9])  # Exibe colunas E a I
+                else:
+                    st.warning("Nenhuma carga encontrada com esse número.")
+            except Exception as e:
+                st.error(f"Erro ao processar dados da planilha: {e}")
