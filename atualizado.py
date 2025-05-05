@@ -108,7 +108,7 @@ with abas[2]:
                     dados_cargas = dados_cargas[dados_cargas.iloc[:, 4] != 'ID CARGA']
                     dados_cargas = dados_cargas.reset_index(drop=True)
 
-                    if dados_cargas.shape[1] >= 5:
+                    if dados_cargas.shape[1] >= 1:
                         resultado = dados_cargas[dados_cargas.iloc[:, 4].astype(str).str.contains(num_carga, na=False)]
                         colunas_exibir = dados_cargas.columns[1:11]
                     else:
