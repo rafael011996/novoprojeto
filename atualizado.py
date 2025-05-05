@@ -94,6 +94,10 @@ with abas[2]:
 
     if num_carga:
         dados_cargas = carregar_dados_cargas(sheet_id, abas_meses)
+        if tipo_carga == "CARGAS MCD":
+            dados_cargas = dados_cargas.dropna(thresh=9)
+            print(dados_cargas.iloc[:, 4].astype(str).head()) # Imprime as primeiras linhas da coluna
+            resultado = dados_cargas[dados_cargas.iloc[:, 4].astype(str).str.contains(num_carga, na=False)]
 
         if dados_cargas.empty:
             st.error("Nenhuma carga encontrada ou erro ao carregar planilha.")
