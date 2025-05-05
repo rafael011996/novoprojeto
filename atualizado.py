@@ -90,7 +90,7 @@ with abas[2]:
     sheet_id = sheet_id_cargas_tcg if tipo_carga == "CARGAS TCG" else sheet_id_cargas_mcd
 
     if num_carga:
-    dados_cargas = carregar_dados_cargas(sheet_id, abas_meses)
+        dados_cargas = carregar_dados_cargas(sheet_id, abas_meses)
     if dados_cargas.empty:
         st.error("Nenhuma carga encontrada ou erro ao carregar planilha.")
     else:
