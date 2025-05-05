@@ -31,9 +31,10 @@ def carregar_dados_cargas(sheet_id, abas):
             df = pd.read_csv(url)
             df['ABA'] = aba
             frames.append(df)
-        except Exception as e:
-            st.warning(f"Erro ao carregar aba {aba}: {e}")
-    return pd.concat(frames, ignore_index=True) if frames else pd.DataFrame()
+except Exception as e:
+    st.warning(f"Erro ao carregar aba {aba}: {e}")
+    import traceback
+    traceback.print_exc() # Adiciona o rastreamento completo do erro
 
 # Aba 1: Entradas
 with abas[0]:
