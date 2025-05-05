@@ -120,7 +120,5 @@ if num_carga:
             st.error(f"Erro ao processar dados da planilha: {e}")
 else:
     st.warning("Nenhuma carga encontrada com esse número.")
-    except Exception as e: # Removi este except, pois o bloco else não pode ter um except diretamente associado
-        st.error(f"Erro ao processar dados da planilha: {e}")
 
 
