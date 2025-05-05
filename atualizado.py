@@ -85,13 +85,9 @@ with abas[2]:
     with col2:
         num_carga = st.text_input("Digite o número da carga:", key="carga")
 
-    # Definir abas por tipo
-    if tipo_carga == "CARGAS TCG":
-        sheet_id = sheet_id_cargas_tcg
-        abas_meses = ['ABRIL/2025', 'MAIO/2025']
-    else:
-        sheet_id = sheet_id_cargas_mcd
-        abas_meses = ['04-ABRIL']
+    abas_meses = ['ABRIL/2025', 'MAIO/2025'] if tipo_carga == "CARGAS TCG" else ['04 ABRIL']
+
+    sheet_id = sheet_id_cargas_tcg if tipo_carga == "CARGAS TCG" else sheet_id_cargas_mcd
 
     if num_carga:
         dados_cargas = carregar_dados_cargas(sheet_id, abas_meses)
@@ -99,11 +95,18 @@ with abas[2]:
             st.error("Nenhuma carga encontrada ou erro ao carregar planilha.")
         else:
             try:
-                resultado = dados_cargas[dados_cargas.iloc[:, 3].astype(str).str.contains(num_carga)]
+                if tipo_carga == "CARGAS TCG":
+                    resultado = dados_cargas[dados_cargas.iloc[:, 3].astype(str).str.contains(num_carga)]
+                    colunas_exibir = slice(4, 9)  # Colunas E a I
+                else:  # CARGAS MCD
+                    resultado = dados_cargas[dados_cargas.iloc[:, 4].astype(str).str.contains(num_carga)]
+                    colunas_exibir = [4, 5, 7, 8, 9, 10]  # Colunas E, F, H, I, J, K
+
                 if not resultado.empty:
                     st.success("Resultado da consulta:")
-                    st.dataframe(resultado.iloc[:, 4:9])  # Colunas E a I
+                    st.dataframe(resultado.iloc[:, colunas_exibir])
                 else:
                     st.warning("Nenhuma carga encontrada com esse número.")
             except Exception as e:
                 st.error(f"Erro ao processar dados da planilha: {e}")
+
