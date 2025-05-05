@@ -5,8 +5,8 @@ import requests
 st.set_page_config(page_title="Consultas TRIUNFANTE", layout="wide")
 
 # URLs das planilhas
-sheet_id_cargas = 'SEU_ID_AQUI'  # <-- Substitua pelo ID real
-sheet_url = f'https://docs.google.com/spreadsheets/d/{sheet_id_cargas}/gviz/tq?tqx=out:csv&sheet='
+sheet_id_cargas = '1TKCyEJ76ESHNTuczB0wMrnc_8z8j3_1LmR6Z9VnlZ7E'  # <-- Substitua pelo ID real
+sheet_url = f'https://docs.google.com/spreadsheets/d/1TKCyEJ76ESHNTuczB0wMrnc_8z8j3_1LmR6Z9VnlZ7E/edit?usp=sharing'
 
 # Abas da interface
 st.title("Consultas TRIUNFANTE")
