@@ -91,7 +91,7 @@ with abas[2]:
         abas_meses = ['ABRIL/2025', 'MAIO/2025']
     else:
         sheet_id = sheet_id_cargas_mcd
-        abas_meses = ['04 ABRIL']
+        abas_meses = ['04-ABRIL']
 
     if num_carga:
         dados_cargas = carregar_dados_cargas(sheet_id, abas_meses)
