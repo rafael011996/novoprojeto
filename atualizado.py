@@ -4,8 +4,8 @@ import streamlit as st
 st.set_page_config(page_title="Consultas TRIUNFANTE", layout="wide")
 
 # IDs das planilhas
-sheet_id_cargas_tcg = '1TKCyEJ76ESHNTuczB0wMrnc_8z8j3_1LmR6Z9VnlZ7E'  # Planilha TCG
-sheet_id_cargas_mcd = '1xlc9vqgg6PwqMAu7-pzQ1VM_ElxDqGNPYFWk8zRXuiE'  # Substitua pelo ID da MCD
+sheet_id_cargas_tcg = '1TKCyEJ76ESHNTuczB0wMrnc_8z8j3_1LmR6Z9VnlZ7E'
+sheet_id_cargas_mcd = '1xlc9vqgg6PwqMAu7-pzQ1VM_ElxDqGNPYFWk8zRXuiE'
 
 # Abas da interface
 st.title("Consultas TRIUNFANTE")
@@ -85,9 +85,13 @@ with abas[2]:
     with col2:
         num_carga = st.text_input("Digite o número da carga:", key="carga")
 
-    abas_meses = ['ABRIL/2025', 'MAIO/2025']  # Abas disponíveis
-
-    sheet_id = sheet_id_cargas_tcg if tipo_carga == "CARGAS TCG" else sheet_id_cargas_mcd
+    # Definir abas por tipo
+    if tipo_carga == "CARGAS TCG":
+        sheet_id = sheet_id_cargas_tcg
+        abas_meses = ['ABRIL/2025', 'MAIO/2025']
+    else:
+        sheet_id = sheet_id_cargas_mcd
+        abas_meses = ['04 ABRIL']
 
     if num_carga:
         dados_cargas = carregar_dados_cargas(sheet_id, abas_meses)
@@ -103,4 +107,3 @@ with abas[2]:
                     st.warning("Nenhuma carga encontrada com esse número.")
             except Exception as e:
                 st.error(f"Erro ao processar dados da planilha: {e}")
-
