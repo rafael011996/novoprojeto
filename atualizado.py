@@ -84,15 +84,14 @@ with abas[2]:
     num_carga = st.text_input("Digite o número da carga:", key="carga")
 
     if num_carga:
-        dados_cargas = carregar_dados_cargas(sheet_id_cargas)
-        if dados_cargas.empty:
-            st.error("Nenhuma carga encontrada ou erro ao carregar planilha.")
+    dados_cargas = carregar_dados_cargas(sheet_id_cargas)
+    if dados_cargas.empty:
+        st.error("Nenhuma carga encontrada ou erro ao carregar planilha.")
+    else:
+        resultado = dados_cargas[dados_cargas.iloc[:, 3].astype(str).str.contains(num_carga)]
+        if not resultado.empty:
+            st.write("Resultado da consulta:")
+            st.dataframe(resultado.iloc[:, 4:9])  # Colunas E a I
         else:
-            resultado = dados_cargas[dados_cargas.iloc[:, 3].astype(str).str.contains(num_carga)]
-            if not resultado.empty:
-                st.write("Resultado da consulta:")
-                st.dataframe(resultado.iloc[:, 4:9])  # Colunas E a I
-            else:
-                st.warning("Nenhuma carga encontrada com esse número.")) 
-else:
-    st.warning("Nenhuma carga encontrada com esse número.")
+            st.warning("Nenhuma carga encontrada com esse número.")
+
