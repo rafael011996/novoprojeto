@@ -102,15 +102,15 @@ with abas[2]:
                 if tipo_carga == "CARGAS TCG":
                     dados_cargas = dados_cargas.dropna(thresh=9)
                     resultado = dados_cargas[dados_cargas.iloc[:, 3].astype(str).str.contains(num_carga, na=False)]
-                    colunas_exibir = dados_cargas.columns[3:9]
+                    colunas_exibir = dados_cargas.columns[2:9]
 
                 elif tipo_carga == "CARGAS MCD":
                     dados_cargas = dados_cargas[dados_cargas.iloc[:, 4] != 'ID CARGA']
                     dados_cargas = dados_cargas.reset_index(drop=True)
 
-                    if dados_cargas.shape[1] >= 6:
+                    if dados_cargas.shape[1] >= 11:
                         resultado = dados_cargas[dados_cargas.iloc[:, 4].astype(str).str.contains(num_carga, na=False)]
-                        colunas_exibir = dados_cargas.columns[4:10]
+                        colunas_exibir = dados_cargas.columns[1:11]
                     else:
                         st.warning("A planilha MCD não tem colunas suficientes para a consulta.")
                         resultado = pd.DataFrame()
