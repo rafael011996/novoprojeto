@@ -110,7 +110,7 @@ if num_carga:
                     # Usando fatiamento correto para as colunas de CARGAS MCD
                     colunas_exibir = dados_cargas.columns[4:11]  # Colunas E, F, G, H, I, J, K
                 else:
-                    st.warning("A planilha MCD não tem colunas suficientes.")
+                    st.warning("A planilha MCD não tem colunas suficientes para a consulta.")
                     resultado = pd.DataFrame()
 
             if not resultado.empty:
