@@ -31,49 +31,57 @@ def carregar_dados_cargas(sheet_id, abas):
             df = pd.read_csv(url)
             df['ABA'] = aba
             frames.append(df)
-            except Exception as e:
-                st.warning(f"Erro ao carregar aba {aba}: {e}")
+        except Exception as e:
+            st.warning(f"Erro ao carregar aba {aba}: {e}")
             import traceback
-                traceback.print_exc() # Adiciona o rastreamento completo do erro
+            traceback.print_exc() # Adiciona o rastreamento completo do erro
+            return pd.DataFrame()
+    return pd.concat(frames, ignore_index=True) if frames else pd.DataFrame()
 
 # Aba 1: Entradas
 with abas[0]:
     st.subheader("Consulta de Entradas")
     dados_entradas = carregar_dados_entradas()
-    dados_entradas = dados_entradas[['Nota', 'Emissao', 'Dt.Cont.', 'CGC/CPF', 'Razao', 'Valor da Nota']]
+    if not dados_entradas.empty:
+        dados_entradas = dados_entradas[['Nota', 'Emissao', 'Dt.Cont.', 'CGC/CPF', 'Razao', 'Valor da Nota']]
 
-    consulta_entrada = st.text_input('Digite o Código, Razão ou CPF/CNPJ da NF:', key="entrada")
-    if consulta_entrada:
-        resultado = dados_entradas[dados_entradas.apply(lambda row:
-            consulta_entrada.lower() in str(row['Nota']).lower() or  
-            consulta_entrada.lower() in str(row['Razao']).lower() or                                 
-            consulta_entrada.lower() in str(row['CGC/CPF']).lower(), axis=1)]
+        consulta_entrada = st.text_input('Digite o Código, Razão ou CPF/CNPJ da NF:', key="entrada")
+        if consulta_entrada:
+            resultado = dados_entradas[dados_entradas.apply(lambda row:
+                consulta_entrada.lower() in str(row['Nota']).lower() or
+                consulta_entrada.lower() in str(row['Razao']).lower() or
+                consulta_entrada.lower() in str(row['CGC/CPF']).lower(), axis=1)]
 
-        if not resultado.empty:
-            st.write('Resultados encontrados:')
-            st.dataframe(resultado)
-        else:
-            st.warning('Nenhum resultado encontrado.')
+            if not resultado.empty:
+                st.write('Resultados encontrados:')
+                st.dataframe(resultado)
+            else:
+                st.warning('Nenhum resultado encontrado.')
+    else:
+        st.error("Erro ao carregar dados de entradas.")
 
 # Aba 2: Produtos
 with abas[1]:
     st.subheader("Consulta de Produtos")
     dados_produtos = carregar_dados_produtos()
-    dados_produtos = dados_produtos[['Produto', 'Produto Fornecedor', 'Descricao', 'Codigo Getin', 'Saldo', 'Multiplo', 'Fator Conversao', 'Data Ult. Compra', 'NCM', 'CEST', '% IPI']]
+    if not dados_produtos.empty:
+        dados_produtos = dados_produtos[['Produto', 'Produto Fornecedor', 'Descricao', 'Codigo Getin', 'Saldo', 'Multiplo', 'Fator Conversao', 'Data Ult. Compra', 'NCM', 'CEST', '% IPI']]
 
-    consulta_produto = st.text_input('Digite o nome, código ou descrição do produto:', key="produto")
-    if consulta_produto:
-        resultado = dados_produtos[dados_produtos.apply(lambda row: 
-            consulta_produto.lower() in str(row['Produto']).lower() or 
-            consulta_produto.lower() in str(row['Descricao']).lower() or 
-            consulta_produto.lower() in str(row['Codigo Getin']).lower() or
-            consulta_produto.lower() in str(row['Produto Fornecedor']).lower(), axis=1)]
+        consulta_produto = st.text_input('Digite o nome, código ou descrição do produto:', key="produto")
+        if consulta_produto:
+            resultado = dados_produtos[dados_produtos.apply(lambda row:
+                consulta_produto.lower() in str(row['Produto']).lower() or
+                consulta_produto.lower() in str(row['Descricao']).lower() or
+                consulta_produto.lower() in str(row['Codigo Getin']).lower() or
+                consulta_produto.lower() in str(row['Produto Fornecedor']).lower(), axis=1)]
 
-        if not resultado.empty:
-            st.write('Resultados encontrados:')
-            st.dataframe(resultado)
-        else:
-            st.warning('Nenhum produto encontrado.')
+            if not resultado.empty:
+                st.write('Resultados encontrados:')
+                st.dataframe(resultado)
+            else:
+                st.warning('Nenhum produto encontrado.')
+    else:
+        st.error("Erro ao carregar dados de produtos.")
 
 # Aba 3: Cargas
 with abas[2]:
@@ -93,34 +101,27 @@ with abas[2]:
         abas_meses = ['04/ABRIL', '05/MAIO']
         sheet_id = sheet_id_cargas_mcd
 
-    if num_carga:
-        dados_cargas = carregar_dados_cargas(sheet_id, abas_meses)
+    dados_cargas = carregar_dados_cargas(sheet_id, abas_meses)
+
+    if dados_cargas.empty:
+        st.error("Erro ao carregar dados de cargas.")
+    elif num_carga:
         if tipo_carga == "CARGAS MCD":
-            dados_cargas = dados_cargas.dropna(thresh=9)
             print(dados_cargas.iloc[:, 4].astype(str).head()) # Imprime as primeiras linhas da coluna
             resultado = dados_cargas[dados_cargas.iloc[:, 4].astype(str).str.contains(num_carga, na=False)]
-
-        if dados_cargas.empty:
-            st.error("Nenhuma carga encontrada ou erro ao carregar planilha.")
-        else:
-            try:
-                if tipo_carga == "CARGAS TCG":
-                    dados_cargas = dados_cargas.dropna(thresh=9)
-                    resultado = dados_cargas[dados_cargas.iloc[:, 3].astype(str).str.contains(num_carga, na=False)]
-                    colunas_exibir = dados_cargas.columns[2:9]
-
-                elif tipo_carga == "CARGAS MCD":
-                     dados_cargas = dados_cargas.dropna(thresh=9)
-                     resultado = dados_cargas[dados_cargas.iloc[:, 4].astype(str).str.contains(num_carga, na=False)]
-                     colunas_exibir = dados_cargas.columns[2:9]
-
-                if not resultado.empty:
-                    st.success("Resultado da consulta:")
-                    st.dataframe(resultado.loc[:, colunas_exibir])
-                else:
-                    st.warning("Nenhuma carga encontrada com esse número.")
-
-            except Exception as e:
-                st.error(f"Erro ao processar dados da planilha: {e}")
+            colunas_exibir = dados_cargas.columns[2:9]
+            if not resultado.empty:
+                st.success("Resultado da consulta:")
+                st.dataframe(resultado.loc[:, colunas_exibir])
+            else:
+                st.warning("Nenhuma carga encontrada com esse número.")
+        elif tipo_carga == "CARGAS TCG":
+            resultado = dados_cargas[dados_cargas.iloc[:, 3].astype(str).str.contains(num_carga, na=False)]
+            colunas_exibir = dados_cargas.columns[2:9]
+            if not resultado.empty:
+                st.success("Resultado da consulta:")
+                st.dataframe(resultado.loc[:, colunas_exibir])
+            else:
+                st.warning("Nenhuma carga encontrada com esse número.")
     else:
         st.info("Digite o número da carga para iniciar a consulta.")
