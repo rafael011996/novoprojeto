@@ -78,15 +78,16 @@ with abas[1]:
 with abas[2]:
     st.subheader("Consulta de Cargas")
 
-    tipo_carga = st.radio("Selecione o tipo de carga:", ["CARGAS TCG", "CARGAS MCD"])
-    num_carga = st.text_input("Digite o número da carga:", key="carga")
+    col1, col2 = st.columns([1, 3])
+    with col1:
+        tipo_carga = st.radio("Tipo de carga:", ["CARGAS TCG", "CARGAS MCD"], horizontal=True)
 
-    abas_meses = ['ABRIL/2025', 'MAIO/2025']  # Adicione aqui os meses que quiser consultar
+    with col2:
+        num_carga = st.text_input("Digite o número da carga:", key="carga")
 
-    if tipo_carga == "CARGAS TCG":
-        sheet_id = sheet_id_cargas_tcg
-    else:
-        sheet_id = sheet_id_cargas_mcd
+    abas_meses = ['ABRIL/2025', 'MAIO/2025']  # Abas disponíveis
+
+    sheet_id = sheet_id_cargas_tcg if tipo_carga == "CARGAS TCG" else sheet_id_cargas_mcd
 
     if num_carga:
         dados_cargas = carregar_dados_cargas(sheet_id, abas_meses)
@@ -96,9 +97,10 @@ with abas[2]:
             try:
                 resultado = dados_cargas[dados_cargas.iloc[:, 3].astype(str).str.contains(num_carga)]
                 if not resultado.empty:
-                    st.write("Resultado da consulta:")
-                    st.dataframe(resultado.iloc[:, 4:9])  # Exibe colunas E a I
+                    st.success("Resultado da consulta:")
+                    st.dataframe(resultado.iloc[:, 4:9])  # Colunas E a I
                 else:
                     st.warning("Nenhuma carga encontrada com esse número.")
             except Exception as e:
                 st.error(f"Erro ao processar dados da planilha: {e}")
+
