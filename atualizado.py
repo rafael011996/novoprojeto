@@ -45,7 +45,7 @@ with abas[0]:
     if consulta_entrada:
         resultado = dados_entradas[dados_entradas.apply(lambda row:
             consulta_entrada.lower() in str(row['Nota']).lower() or  
-            consulta_entrada.lower() in str(row['Razao']).lower() or                                
+            consulta_entrada.lower() in str(row['Razao']).lower() or                                 
             consulta_entrada.lower() in str(row['CGC/CPF']).lower(), axis=1)]
         
         if not resultado.empty:
@@ -102,11 +102,13 @@ if num_carga:
 
             if tipo_carga == "CARGAS TCG":
                 resultado = dados_cargas[dados_cargas.iloc[:, 3].astype(str).str.contains(num_carga, na=False)]
-                colunas_exibir = slice(4, 9) # Colunas E a I
-            else: # CARGAS MCD
+                # Usando fatiamento correto nas colunas
+                colunas_exibir = dados_cargas.columns[4:9]  # Colunas E a I
+            else:  # CARGAS MCD
                 if dados_cargas.shape[1] >= 11:
                     resultado = dados_cargas[dados_cargas.iloc[:, 4].astype(str).str.contains(num_carga, na=False)]
-                    colunas_exibir = [4, 5, 6, 7, 8, 9, 10] # Colunas E, F, G, H, I, J, K
+                    # Usando fatiamento correto para as colunas de CARGAS MCD
+                    colunas_exibir = dados_cargas.columns[4:11]  # Colunas E, F, G, H, I, J, K
                 else:
                     st.warning("A planilha MCD não tem colunas suficientes.")
                     resultado = pd.DataFrame()
@@ -120,5 +122,3 @@ if num_carga:
             st.error(f"Erro ao processar dados da planilha: {e}")
 else:
     st.warning("Nenhuma carga encontrada com esse número.")
-
-
