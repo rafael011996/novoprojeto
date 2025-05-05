@@ -106,8 +106,8 @@ with abas[2]:
 
                 elif tipo_carga == "CARGAS MCD":
                      dados_cargas = dados_cargas.dropna(thresh=9)
-                    resultado = dados_cargas[dados_cargas.iloc[:, 4].astype(str).str.contains(num_carga, na=False)]
-                    colunas_exibir = dados_cargas.columns[2:9]
+                     resultado = dados_cargas[dados_cargas.iloc[:, 4].astype(str).str.contains(num_carga, na=False)]
+                     colunas_exibir = dados_cargas.columns[2:9]
 
                 if not resultado.empty:
                     st.success("Resultado da consulta:")
