@@ -97,9 +97,11 @@ with abas[2]:
     if tipo_carga == "CARGAS TCG":
         abas_meses = ['ABRIL/2025', 'MAIO/2025']
         sheet_id = sheet_id_cargas_tcg
+        colunas_exibir_tcg = [2, 3, 5, 6, 7, 8]  # Ajuste para as colunas desejadas de TCG (C, D, F, G, H, I)
     else:
         abas_meses = ['04/ABRIL', '05/MAIO']
         sheet_id = sheet_id_cargas_mcd
+        colunas_exibir_mcd = [4, 5, 7, 8, 9, 10] # Índices das colunas E, F, H, I, J, K
 
     dados_cargas = carregar_dados_cargas(sheet_id, abas_meses)
 
@@ -109,18 +111,16 @@ with abas[2]:
         if tipo_carga == "CARGAS MCD":
             print(dados_cargas.iloc[:, 4].astype(str).head()) # Imprime as primeiras linhas da coluna
             resultado = dados_cargas[dados_cargas.iloc[:, 4].astype(str).str.contains(num_carga, na=False)]
-            colunas_exibir = [4, 5, 7, 8, 9, 10]  # Índices das colunas E, F, H, I, J, K
             if not resultado.empty:
                 st.success("Resultado da consulta:")
-                st.dataframe(resultado.iloc[:, colunas_exibir])
+                st.dataframe(resultado.iloc[:, colunas_exibir_mcd])
             else:
                 st.warning("Nenhuma carga encontrada com esse número.")
         elif tipo_carga == "CARGAS TCG":
             resultado = dados_cargas[dados_cargas.iloc[:, 3].astype(str).str.contains(num_carga, na=False)]
-            colunas_exibir = [2, 3, 5, 6, 7, 8] # Ajuste conforme as colunas desejadas para TCG
             if not resultado.empty:
                 st.success("Resultado da consulta:")
-                st.dataframe(resultado.iloc[:, colunas_exibir])
+                st.dataframe(resultado.iloc[:, colunas_exibir_tcg])
             else:
                 st.warning("Nenhuma carga encontrada com esse número.")
     else:
