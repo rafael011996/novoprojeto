@@ -109,11 +109,20 @@ with abas[2]:
         st.error("Erro ao carregar dados de cargas.")
     elif num_carga:
         if tipo_carga == "CARGAS MCD":
-            print(dados_cargas.iloc[:, 4].astype(str).head()) # Imprime as primeiras linhas da coluna
+            print(dados_cargas.iloc[:, 4].astype(str).head()) # Imprime as primeiras linhas da coluna de busca
             resultado = dados_cargas[dados_cargas.iloc[:, 4].astype(str).str.contains(num_carga, na=False)]
+            print(f"Número de linhas em resultado após filtro: {len(resultado)}")
+            print(f"Número de colunas em resultado após filtro: {resultado.shape[1]}")
+            print(f"Colunas em resultado após filtro: {resultado.columns.tolist()}")
             if not resultado.empty:
                 st.success("Resultado da consulta:")
-                st.dataframe(resultado.iloc[:, colunas_exibir_mcd])
+                try:
+                    st.dataframe(resultado.iloc[:, colunas_exibir_mcd])
+                except IndexError as e:
+                    st.error(f"Erro ao exibir colunas: {e}")
+                    st.write("As colunas esperadas podem não existir no resultado.")
+                    st.write("Colunas disponíveis no resultado:")
+                    st.write(resultado.columns.tolist())
             else:
                 st.warning("Nenhuma carga encontrada com esse número.")
         elif tipo_carga == "CARGAS TCG":
