@@ -103,7 +103,7 @@ if num_carga:
             if tipo_carga == "CARGAS TCG":
                 resultado = dados_cargas[dados_cargas.iloc[:, 3].astype(str).str.contains(num_carga, na=False)]
                 # Usando fatiamento correto nas colunas
-                colunas_exibir = dados_cargas.columns[4:9]  # Colunas E a I
+                colunas_exibir = dados_cargas.columns[3:9]  # Colunas E a I
             else:  # CARGAS MCD
                 if dados_cargas.shape[1] >= 11:
                     resultado = dados_cargas[dados_cargas.iloc[:, 4].astype(str).str.contains(num_carga, na=False)]
