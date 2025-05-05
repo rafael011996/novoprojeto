@@ -106,7 +106,7 @@ if num_carga:
                 colunas_exibir = dados_cargas.columns[3:9]  # Colunas E a I
             else:  # CARGAS MCD
                 if dados_cargas.shape[1] >= 11:
-                    resultado = dados_cargas[dados_cargas.iloc[:, 5].astype(str).str.contains(num_carga, na=False)]
+                    resultado = dados_cargas[dados_cargas.iloc[:, 4].astype(str).str.contains(num_carga, na=False)]
                     # Usando fatiamento correto para as colunas de CARGAS MCD
                     colunas_exibir = dados_cargas.columns[5, 6, 8, 9, 10, 11]  # Colunas E, F, G, H, I, J, K
                 else:
