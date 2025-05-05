@@ -95,16 +95,16 @@ with abas[2]:
         st.error("Nenhuma carga encontrada ou erro ao carregar planilha.")
     else:
         try:
-            # Filtra linhas com pelo menos 11 colunas não-nulas
+            # Remove linhas com menos de 11 colunas válidas (para evitar erro de índice)
             dados_cargas = dados_cargas.dropna(thresh=11)
 
             if tipo_carga == "CARGAS TCG":
                 resultado = dados_cargas[dados_cargas.iloc[:, 3].astype(str).str.contains(num_carga, na=False)]
-                colunas_exibir = slice(4, 9)  # E a I
-            else:  # MCD
+                colunas_exibir = slice(4, 9)  # Colunas E a I
+            else:  # CARGAS MCD
                 if dados_cargas.shape[1] >= 11:
                     resultado = dados_cargas[dados_cargas.iloc[:, 4].astype(str).str.contains(num_carga, na=False)]
-                    colunas_exibir = [4, 5, 7, 8, 9, 10]  # E, F, H, I, J, K
+                    colunas_exibir = [4, 5, 7, 8, 9, 10]  # Colunas E, F, H, I, J, K
                 else:
                     st.warning("A planilha MCD não tem colunas suficientes.")
                     resultado = pd.DataFrame()
