@@ -7,9 +7,9 @@ st.set_page_config(page_title="Consultas TRIUNFANTE", layout="wide")
 sheet_id_cargas_tcg = '1TKCyEJ76ESHNTuczB0wMrnc_8z8j3_1LmR6Z9VnlZ7E'
 sheet_id_cargas_mcd = '1xlc9vqgg6PwqMAu7-pzQ1VM_ElxDqGNPYFWk8zRXuiE'
 
-# Abas da interface
+# Título e abas
 st.title("Consultas TRIUNFANTE")
-abas = st.tabs(["📥 Consulta de Entradas", "📦 Consulta de Produtos", "🚚 Consulta de Cargas"])
+abas = st.tabs(["\U0001F4E5 Consulta de Entradas", "\U0001F4E6 Consulta de Produtos", "\U0001F69A Consulta de Cargas"])
 
 # Funções de carregamento
 @st.cache_data(ttl=0)
@@ -47,7 +47,7 @@ with abas[0]:
             consulta_entrada.lower() in str(row['Nota']).lower() or  
             consulta_entrada.lower() in str(row['Razao']).lower() or                                 
             consulta_entrada.lower() in str(row['CGC/CPF']).lower(), axis=1)]
-        
+
         if not resultado.empty:
             st.write('Resultados encontrados:')
             st.dataframe(resultado)
@@ -67,7 +67,7 @@ with abas[1]:
             consulta_produto.lower() in str(row['Descricao']).lower() or 
             consulta_produto.lower() in str(row['Codigo Getin']).lower() or
             consulta_produto.lower() in str(row['Produto Fornecedor']).lower(), axis=1)]
-        
+
         if not resultado.empty:
             st.write('Resultados encontrados:')
             st.dataframe(resultado)
@@ -85,40 +85,43 @@ with abas[2]:
     with col2:
         num_carga = st.text_input("Digite o número da carga:", key="carga")
 
-    abas_meses = ['ABRIL/2025', 'MAIO/2025'] if tipo_carga == "CARGAS TCG" else ['04/ABRIL', '05/MAIO']
-
-    sheet_id = sheet_id_cargas_tcg if tipo_carga == "CARGAS TCG" else sheet_id_cargas_mcd
-
-    dados_cargas = pd.DataFrame() # Inicializa dados_cargas com um DataFrame vazio
-
-if num_carga:
-    dados_cargas = carregar_dados_cargas(sheet_id, abas_meses)
-    if dados_cargas.empty:
-        st.error("Nenhuma carga encontrada ou erro ao carregar planilha.")
+    if tipo_carga == "CARGAS TCG":
+        abas_meses = ['ABRIL/2025', 'MAIO/2025']
+        sheet_id = sheet_id_cargas_tcg
     else:
-        try:
-            # Remove linhas com menos de 11 colunas válidas (para evitar erro de índice)
-            dados_cargas = dados_cargas.dropna(thresh=11)
+        abas_meses = ['04/ABRIL', '05/MAIO']
+        sheet_id = sheet_id_cargas_mcd
 
-            if tipo_carga == "CARGAS TCG":
-                resultado = dados_cargas[dados_cargas.iloc[:, 3].astype(str).str.contains(num_carga, na=False)]
-                # Usando fatiamento correto nas colunas
-                colunas_exibir = dados_cargas.columns[3:9]  # Colunas E a I
-            else:  # CARGAS MCD
-                if dados_cargas.shape[1] >= 11:
-                    resultado = dados_cargas[dados_cargas.iloc[:, 5].astype(str).str.contains(num_carga, na=False)]
-                    # Usando fatiamento correto para as colunas de CARGAS MCD
-                    colunas_exibir = dados_cargas.columns[5:11]  # Colunas E, F, G, H, I, J, K
+    if num_carga:
+        dados_cargas = carregar_dados_cargas(sheet_id, abas_meses)
+
+        if dados_cargas.empty:
+            st.error("Nenhuma carga encontrada ou erro ao carregar planilha.")
+        else:
+            try:
+                if tipo_carga == "CARGAS TCG":
+                    dados_cargas = dados_cargas.dropna(thresh=9)
+                    resultado = dados_cargas[dados_cargas.iloc[:, 3].astype(str).str.contains(num_carga, na=False)]
+                    colunas_exibir = dados_cargas.columns[3:9]
+
+                elif tipo_carga == "CARGAS MCD":
+                    dados_cargas = dados_cargas[dados_cargas.iloc[:, 0] != 'REGIÃO']
+                    dados_cargas = dados_cargas.reset_index(drop=True)
+
+                    if dados_cargas.shape[1] >= 6:
+                        resultado = dados_cargas[dados_cargas.iloc[:, 4].astype(str).str.contains(num_carga, na=False)]
+                        colunas_exibir = dados_cargas.columns[0:6]
+                    else:
+                        st.warning("A planilha MCD não tem colunas suficientes para a consulta.")
+                        resultado = pd.DataFrame()
+
+                if not resultado.empty:
+                    st.success("Resultado da consulta:")
+                    st.dataframe(resultado.loc[:, colunas_exibir])
                 else:
-                    st.warning("A planilha MCD não tem colunas suficientes para a consulta.")
-                    resultado = pd.DataFrame()
+                    st.warning("Nenhuma carga encontrada com esse número.")
 
-            if not resultado.empty:
-                st.success("Resultado da consulta:")
-                st.dataframe(resultado.loc[:, colunas_exibir])
-            else:
-                st.warning("Nenhuma carga encontrada com esse número.")
-        except Exception as e:
-            st.error(f"Erro ao processar dados da planilha: {e}")
-else:
-    st.warning("Nenhuma carga encontrada com esse número.")
+            except Exception as e:
+                st.error(f"Erro ao processar dados da planilha: {e}")
+    else:
+        st.info("Digite o número da carga para iniciar a consulta.")
