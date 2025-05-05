@@ -5,7 +5,7 @@ st.set_page_config(page_title="Consultas TRIUNFANTE", layout="wide")
 
 # IDs das planilhas
 sheet_id_cargas_tcg = '1TKCyEJ76ESHNTuczB0wMrnc_8z8j3_1LmR6Z9VnlZ7E'
-sheet_id_cargas_mcd = '1xlc9vqgg6PwqMAu7-pzQ1VM_ElxDqGNPYFWk8zRXuiE'
+sheet_id_cargas_mcd = '2PACX-1vSwFIxbCPyFhzcr5Ws7Or4bk6piJclpjE0zsw4B_rNRQaA6_UK-L454N2qflaSbeE-oHBgyvgXGH35G'
 
 # Título e abas
 st.title("Consultas TRIUNFANTE")
