@@ -85,7 +85,7 @@ with abas[2]:
     with col2:
         num_carga = st.text_input("Digite o número da carga:", key="carga")
 
-    abas_meses = ['ABRIL/2025', 'MAIO/2025'] if tipo_carga == "CARGAS TCG" else ['04 ABRIL']
+    abas_meses = ['ABRIL/2025', 'MAIO/2025'] if tipo_carga == "CARGAS TCG" else ['04-ABRIL', '05-MAIO']
 
     sheet_id = sheet_id_cargas_tcg if tipo_carga == "CARGAS TCG" else sheet_id_cargas_mcd
 
