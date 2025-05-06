@@ -6,10 +6,11 @@ st.set_page_config(page_title="Consultas TRIUNFANTE", layout="wide")
 # IDs das planilhas
 sheet_id_cargas_tcg = '1TKCyEJ76ESHNTuczB0wMrnc_8z8j3_1LmR6Z9VnlZ7E'
 sheet_id_cargas_mcd = '1xlc9vqgg6PwqMAu7-pzQ1VM_ElxDqGNPYFWk8zRXuiE'
+sheet_id_cargas_dev = '1pUFv1VzcOI9-u0miYW1lfqDMlKHUbo0S2lq62GG3KtQ'
 
 # Título e abas
 st.title("Consultas TRIUNFANTE")
-abas = st.tabs(["\U0001F4E5 Consulta de Entradas", "\U0001F4E6 Consulta de Produtos", "\U0001F69A Consulta de Cargas"])
+abas = st.tabs(["\U0001F4E5 Consulta de Entradas", "\U0001F4E6 Consulta de Produtos TCG E MCD", "\U0001F69A Consulta de Cargas", "\U0001F610A MOTIVOS DE DEVOLUÇÕES"])
 
 # Funções de carregamento
 @st.cache_data(ttl=0)
