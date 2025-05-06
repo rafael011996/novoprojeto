@@ -48,9 +48,7 @@ with abas[0]:
         consulta_entrada = st.text_input('Digite o Código, Razão ou CPF/CNPJ da NF:', key="entrada")
         if consulta_entrada:
             resultado = dados_entradas[dados_entradas.apply(lambda row:
-                consulta_entrada.lower() in str(row['Nota']).lower() or
-                consulta_entrada.lower() in str(row['Razao']).lower() or
-                consulta_entrada.lower() in str(row['CGC/CPF']).lower(), axis=1)]
+                consulta_entrada.lower() in str(row['Nota']).lower(), axis=1)]
 
             if not resultado.empty:
                 st.write('Resultados encontrados:')
