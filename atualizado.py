@@ -10,7 +10,12 @@ sheet_id_cargas_dev = '1pUFv1VzcOI9-u0miYW1lfqDMlKHUbo0S2lq62GG3KtQ'
 
 # Título e abas
 st.title("Consultas TRIUNFANTE")
-abas = st.tabs(["\U0001F4E5 Consulta de Entradas", "\U0001F4E6 Consulta de Produtos TCG E MCD", "\U0001F69A Consulta de Cargas", "\U0001F4E5 MOTIVOS DE DEVOLUÇÕES"])
+abas = st.tabs([
+    "📥 Consulta de Entradas", 
+    "📦 Consulta de Produtos TCG E MCD", 
+    "🚚 Consulta de Cargas", 
+    "📥 MOTIVOS DE DEVOLUÇÕES"
+])
 
 # Funções de carregamento
 @st.cache_data(ttl=0)
@@ -35,7 +40,7 @@ def carregar_dados_cargas(sheet_id, abas):
         except Exception as e:
             st.warning(f"Erro ao carregar aba {aba}: {e}")
             import traceback
-            traceback.print_exc() # Adiciona o rastreamento completo do erro
+            traceback.print_exc()
             return pd.DataFrame()
     return pd.concat(frames, ignore_index=True) if frames else pd.DataFrame()
 
@@ -45,12 +50,10 @@ with abas[0]:
     dados_entradas = carregar_dados_entradas()
     if not dados_entradas.empty:
         dados_entradas = dados_entradas[['Nota', 'Emissao', 'Dt.Cont.', 'CGC/CPF', 'Razao', 'Valor da Nota']]
-
         consulta_entrada = st.text_input('Digite o Código, Razão ou CPF/CNPJ da NF:', key="entrada")
         if consulta_entrada:
-            resultado = dados_entradas[dados_entradas.apply(lambda row:
-                consulta_entrada.lower() in str(row['Nota']).lower(), axis=1)]
-
+            resultado = dados_entradas[dados_entradas.apply(
+                lambda row: consulta_entrada.lower() in str(row['Nota']).lower(), axis=1)]
             if not resultado.empty:
                 st.write('Resultados encontrados:')
                 st.dataframe(resultado)
@@ -65,7 +68,6 @@ with abas[1]:
     dados_produtos = carregar_dados_produtos()
     if not dados_produtos.empty:
         dados_produtos = dados_produtos[['Produto', 'Produto Fornecedor', 'Descricao', 'Codigo Getin', 'Saldo', 'Multiplo', 'Fator Conversao', 'Data Ult. Compra', 'NCM', 'CEST', '% IPI']]
-
         consulta_produto = st.text_input('Digite o nome, código ou descrição do produto:', key="produto")
         if consulta_produto:
             resultado = dados_produtos[dados_produtos.apply(lambda row:
@@ -73,7 +75,6 @@ with abas[1]:
                 consulta_produto.lower() in str(row['Descricao']).lower() or
                 consulta_produto.lower() in str(row['Codigo Getin']).lower() or
                 consulta_produto.lower() in str(row['Produto Fornecedor']).lower(), axis=1)]
-
             if not resultado.empty:
                 st.write('Resultados encontrados:')
                 st.dataframe(resultado)
@@ -89,18 +90,17 @@ with abas[2]:
     col1, col2 = st.columns([1, 3])
     with col1:
         tipo_carga = st.radio("Tipo de carga:", ["CARGAS TCG", "CARGAS MCD"], horizontal=True)
-
     with col2:
         num_carga = st.text_input("Digite o número da carga:", key="carga")
 
     if tipo_carga == "CARGAS TCG":
         abas_meses = ['ABRIL/2025', 'MAIO/2025']
         sheet_id = sheet_id_cargas_tcg
-        colunas_exibir_tcg = [2, 3, 4, 5, 6, 7, 8]  # Ajuste para as colunas desejadas de TCG (C, D, F, G, H, I)
+        colunas_exibir_tcg = [2, 3, 4, 5, 6, 7, 8]
     else:
         abas_meses = ['04/ABRIL', '05/MAIO']
         sheet_id = sheet_id_cargas_mcd
-        colunas_exibir_mcd = [4] # Índices para CARGA, DIA, Unnamed: 6, ABA
+        colunas_exibir_mcd = [4]
 
     dados_cargas = carregar_dados_cargas(sheet_id, abas_meses)
 
@@ -108,18 +108,13 @@ with abas[2]:
         st.error("Erro ao carregar dados de cargas.")
     elif num_carga:
         if tipo_carga == "CARGAS MCD":
-            print(dados_cargas.iloc[:, 4].astype(str).head()) # Imprime as primeiras linhas da coluna de busca
             resultado = dados_cargas[dados_cargas.iloc[:, 4].astype(str).str.contains(num_carga, na=False)]
-            print(f"Número de linhas em resultado após filtro: {len(resultado)}")
-            print(f"Número de colunas em resultado após filtro: {resultado.shape[1]}")
-            print(f"Colunas em resultado após filtro: {resultado.columns.tolist()}")
             if not resultado.empty:
                 st.success("Resultado da consulta:")
                 try:
                     st.dataframe(resultado.iloc[:, colunas_exibir_mcd])
                 except IndexError as e:
                     st.error(f"Erro ao exibir colunas: {e}")
-                    st.write("As colunas esperadas podem não existir no resultado.")
                     st.write("Colunas disponíveis no resultado:")
                     st.write(resultado.columns.tolist())
             else:
@@ -133,3 +128,16 @@ with abas[2]:
                 st.warning("Nenhuma carga encontrada com esse número.")
     else:
         st.info("Digite o número da carga para iniciar a consulta.")
+
+# Aba 4: Motivos de Devoluções
+with abas[3]:
+    st.subheader("Consulta por Código de Devolução")
+
+    codigo_busca = st.text_input("Digite o código de devolução:", key="codigo_devolucao")
+    
+    if codigo_busca:
+        aba_motivos = '📥 MOTIVOS DE DEVOLUÇÕES'
+        dados_motivos = carregar_dados_cargas(sheet_id_cargas_dev, [aba_motivos])
+
+        if dados_motivos.empty:
+            st.error("Erro ao carregar dados da aba
