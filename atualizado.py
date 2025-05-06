@@ -1,5 +1,6 @@
 import pandas as pd
 import streamlit as st
+import urllib.parse
 
 st.set_page_config(page_title="Consultas TRIUNFANTE", layout="wide")
 
@@ -19,13 +20,7 @@ abas = st.tabs([
 
 # Funções de carregamento
 @st.cache_data(ttl=0)
-def carregar_dados_entradas():
-    url = 'https://raw.githubusercontent.com/rafael011996/consultaentrada/main/consultaentrada.csv'
-    return pd.read_csv(url, delimiter=';', encoding='utf-8')
-
-@st.cache_data(ttl=0)
-def carregar_dados_produtos():
-    url = 'https://raw.githubusercontent.com/rafael011996/consulta/main/produtos.csv'
+def carregar_dados_csv(url):
     return pd.read_csv(url, delimiter=';', encoding='utf-8')
 
 @st.cache_data(ttl=0)
@@ -33,7 +28,8 @@ def carregar_dados_cargas(sheet_id, abas):
     frames = []
     for aba in abas:
         try:
-            url = f'https://docs.google.com/spreadsheets/d/{sheet_id}/gviz/tq?tqx=out:csv&sheet={aba}'
+            aba_codificada = urllib.parse.quote(aba, safe='')
+            url = f'https://docs.google.com/spreadsheets/d/{sheet_id}/gviz/tq?tqx=out:csv&sheet={aba_codificada}'
             df = pd.read_csv(url)
             df['ABA'] = aba
             frames.append(df)
@@ -47,46 +43,38 @@ def carregar_dados_cargas(sheet_id, abas):
 # Aba 1: Entradas
 with abas[0]:
     st.subheader("Consulta de Entradas")
-    dados_entradas = carregar_dados_entradas()
+    url = 'https://raw.githubusercontent.com/rafael011996/consultaentrada/main/consultaentrada.csv'
+    dados_entradas = carregar_dados_csv(url)
+
     if not dados_entradas.empty:
         dados_entradas = dados_entradas[['Nota', 'Emissao', 'Dt.Cont.', 'CGC/CPF', 'Razao', 'Valor da Nota']]
         consulta_entrada = st.text_input('Digite o Código, Razão ou CPF/CNPJ da NF:', key="entrada")
         if consulta_entrada:
             resultado = dados_entradas[dados_entradas.apply(
-                lambda row: consulta_entrada.lower() in str(row['Nota']).lower(), axis=1)]
-            if not resultado.empty:
-                st.write('Resultados encontrados:')
-                st.dataframe(resultado)
-            else:
-                st.warning('Nenhum resultado encontrado.')
+                lambda row: consulta_entrada.lower() in str(row).lower(), axis=1)]
+            st.dataframe(resultado if not resultado.empty else "Nenhum resultado encontrado.")
     else:
         st.error("Erro ao carregar dados de entradas.")
 
 # Aba 2: Produtos
 with abas[1]:
     st.subheader("Consulta de Produtos")
-    dados_produtos = carregar_dados_produtos()
+    url = 'https://raw.githubusercontent.com/rafael011996/consulta/main/produtos.csv'
+    dados_produtos = carregar_dados_csv(url)
+
     if not dados_produtos.empty:
         dados_produtos = dados_produtos[['Produto', 'Produto Fornecedor', 'Descricao', 'Codigo Getin', 'Saldo', 'Multiplo', 'Fator Conversao', 'Data Ult. Compra', 'NCM', 'CEST', '% IPI']]
         consulta_produto = st.text_input('Digite o nome, código ou descrição do produto:', key="produto")
         if consulta_produto:
-            resultado = dados_produtos[dados_produtos.apply(lambda row:
-                consulta_produto.lower() in str(row['Produto']).lower() or
-                consulta_produto.lower() in str(row['Descricao']).lower() or
-                consulta_produto.lower() in str(row['Codigo Getin']).lower() or
-                consulta_produto.lower() in str(row['Produto Fornecedor']).lower(), axis=1)]
-            if not resultado.empty:
-                st.write('Resultados encontrados:')
-                st.dataframe(resultado)
-            else:
-                st.warning('Nenhum produto encontrado.')
+            resultado = dados_produtos[dados_produtos.apply(
+                lambda row: consulta_produto.lower() in str(row).lower(), axis=1)]
+            st.dataframe(resultado if not resultado.empty else "Nenhum produto encontrado.")
     else:
         st.error("Erro ao carregar dados de produtos.")
 
 # Aba 3: Cargas
 with abas[2]:
     st.subheader("Consulta de Cargas")
-
     col1, col2 = st.columns([1, 3])
     with col1:
         tipo_carga = st.radio("Tipo de carga:", ["CARGAS TCG", "CARGAS MCD"], horizontal=True)
@@ -96,48 +84,37 @@ with abas[2]:
     if tipo_carga == "CARGAS TCG":
         abas_meses = ['ABRIL/2025', 'MAIO/2025']
         sheet_id = sheet_id_cargas_tcg
-        colunas_exibir_tcg = [2, 3, 4, 5, 6, 7, 8]
     else:
         abas_meses = ['04/ABRIL', '05/MAIO']
         sheet_id = sheet_id_cargas_mcd
-        colunas_exibir_mcd = [4]
 
     dados_cargas = carregar_dados_cargas(sheet_id, abas_meses)
 
     if dados_cargas.empty:
         st.error("Erro ao carregar dados de cargas.")
     elif num_carga:
-        if tipo_carga == "CARGAS MCD":
-            resultado = dados_cargas[dados_cargas.iloc[:, 4].astype(str).str.contains(num_carga, na=False)]
-            if not resultado.empty:
-                st.success("Resultado da consulta:")
-                try:
-                    st.dataframe(resultado.iloc[:, colunas_exibir_mcd])
-                except IndexError as e:
-                    st.error(f"Erro ao exibir colunas: {e}")
-                    st.write("Colunas disponíveis no resultado:")
-                    st.write(resultado.columns.tolist())
-            else:
-                st.warning("Nenhuma carga encontrada com esse número.")
-        elif tipo_carga == "CARGAS TCG":
-            resultado = dados_cargas[dados_cargas.iloc[:, 3].astype(str).str.contains(num_carga, na=False)]
-            if not resultado.empty:
-                st.success("Resultado da consulta:")
-                st.dataframe(resultado.iloc[:, colunas_exibir_tcg])
-            else:
-                st.warning("Nenhuma carga encontrada com esse número.")
+        filtro = dados_cargas[dados_cargas.apply(lambda row: num_carga in str(row.values), axis=1)]
+        if not filtro.empty:
+            st.dataframe(filtro)
+        else:
+            st.warning("Nenhuma carga encontrada com esse número.")
     else:
         st.info("Digite o número da carga para iniciar a consulta.")
 
 # Aba 4: Motivos de Devoluções
 with abas[3]:
-    st.subheader("Consulta por Código de Devolução")
+    st.subheader("Consulta de Motivos de Devoluções")
+    aba_motivos = ["📥 MOTIVOS DE DEVOLUÇÕES"]
+    dados_motivos = carregar_dados_cargas(sheet_id_cargas_dev, aba_motivos)
 
-    codigo_busca = st.text_input("Digite o código de devolução:", key="codigo_devolucao")
-    
-    if codigo_busca:
-        aba_motivos = '📥 MOTIVOS DE DEVOLUÇÕES'
-        dados_motivos = carregar_dados_cargas(sheet_id_cargas_dev, [aba_motivos])
-
-        if dados_motivos.empty:
-            st.error("Erro ao carregar dados da aba")
+    if dados_motivos.empty:
+        st.error("Erro ao carregar dados da aba de devoluções.")
+    else:
+        consulta_codigo = st.text_input("Digite o código de devolução (coluna J):", key="codigo_dev")
+        if consulta_codigo:
+            resultado = dados_motivos[dados_motivos.iloc[:, 9].astype(str).str.contains(consulta_codigo, na=False)]
+            if not resultado.empty:
+                colunas_exibir = list(resultado.columns[:9])  # A até I
+                st.dataframe(resultado[colunas_exibir])
+            else:
+                st.warning("Nenhum resultado encontrado para o código informado.")
