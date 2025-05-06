@@ -140,4 +140,4 @@ with abas[3]:
         dados_motivos = carregar_dados_cargas(sheet_id_cargas_dev, [aba_motivos])
 
         if dados_motivos.empty:
-            st.error("Erro ao carregar dados da aba
+            st.error("Erro ao carregar dados da aba")
