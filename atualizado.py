@@ -41,20 +41,35 @@ def carregar_dados_cargas(sheet_id, abas):
     return pd.concat(frames, ignore_index=True) if frames else pd.DataFrame()
 
 # Aba 1: Entradas
+# Aba 1: Consulta por Nota em planilha do Google
 with abas[0]:
-    st.subheader("Consulta de Entradas")
-    url = 'https://raw.githubusercontent.com/rafael011996/consultaentrada/main/consultaentrada.csv'
-    dados_entradas = carregar_dados_csv(url)
+    st.subheader("Consulta por Nota Fiscal de ENTRADAS")
+    
+    # ID da nova planilha de entrada
+    sheet_id_entrada_google = "1zk3sp8dazVU4qx_twI7oUe6l7ggTKzSkEmxAcYpoxqk"
+    aba_nome = "Página1"  # ajuste se o nome da aba for diferente
+    
+    @st.cache_data(ttl=0)
+    def carregar_dados_google_sheet(sheet_id, aba):
+        aba_codificada = urllib.parse.quote(aba, safe='')
+        url = f'https://docs.google.com/spreadsheets/d/{sheet_id}/gviz/tq?tqx=out:csv&sheet={aba_codificada}'
+        return pd.read_csv(url)
 
-    if not dados_entradas.empty:
-        dados_entradas = dados_entradas[['Nota', 'Emissao', 'Dt.Cont.', 'CGC/CPF', 'Razao', 'Valor da Nota']]
-        consulta_entrada = st.text_input('Digite o Código, Razão ou CPF/CNPJ da NF:', key="entrada")
-        if consulta_entrada:
-            resultado = dados_entradas[dados_entradas.apply(
-                lambda row: consulta_entrada.lower() in str(row).lower(), axis=1)]
-            st.dataframe(resultado if not resultado.empty else "Nenhum resultado encontrado.")
-    else:
-        st.error("Erro ao carregar dados de entradas.")
+    try:
+        dados_entrada_sheet = carregar_dados_google_sheet(sheet_id_entrada_google, aba_nome)
+        st.success("Planilha carregada com sucesso.")
+        
+        nota_consulta = st.text_input("Digite o número da Nota Fiscal (coluna A):", key="nota_entrada")
+        
+        if nota_consulta:
+            resultado = dados_entrada_sheet[dados_entrada_sheet.iloc[:, 0].astype(str) == nota_consulta]
+            if not resultado.empty:
+                st.dataframe(resultado)
+            else:
+                st.warning("Nenhuma nota encontrada com esse número.")
+    except Exception as e:
+        st.error(f"Erro ao carregar dados da planilha: {e}")
+
 
 # Aba 2: Produtos
 with abas[1]:
