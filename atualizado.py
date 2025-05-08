@@ -1,7 +1,6 @@
-import pandas as pd 
+import pandas as pd
 import streamlit as st
 import urllib.parse
-from datetime import datetime
 
 st.set_page_config(page_title="Consultas TRIUNFANTE", layout="wide")
 
@@ -12,6 +11,16 @@ sheet_id_cargas_mcd = '1xlc9vqgg6PwqMAu7-pzQ1VM_ElxDqGNPYFWk8zRXuiE'
 sheet_id_cargas_dev = '1pUFv1VzcOI9-u0miYW1lfqDMlKHUbo0S2lq62GG3KtQ'
 sheet_id_pedidos = '1xlJhN6PRrd297dkKbxz9W9TVL_-HK5UeGjuKxm8-Rbg'
 sheet_id_produtos = '1PzkzkHwT5vv4u71KCNXpF-TFClzYKNngWHg13_wOR6o'
+
+# Título e abas
+st.title("Consultas TRIUNFANTE")
+abas = st.tabs([
+    "📥 Consulta de Entradas",
+    "📦 Consulta de Produtos TCG E MCD",
+    "🚚 Consulta de Cargas",
+    "📥 MOTIVOS DE DEVOLUÇÕES",
+    "🧾 Consulta de Pedidos"
+])
 
 # Funções de carregamento
 @st.cache_data(ttl=0)
@@ -32,16 +41,6 @@ def carregar_dados_cargas(sheet_id, abas):
             st.warning(f"Erro ao carregar aba {aba}: {e}")
     return pd.concat(frames, ignore_index=True) if frames else pd.DataFrame()
 
-# Título e abas
-st.title("Consultas TRIUNFANTE")
-abas = st.tabs([
-    "📥 Consulta de Entradas",
-    "📦 Consulta de Produtos TCG E MCD",
-    "🚚 Consulta de Cargas",
-    "📥 MOTIVOS DE DEVOLUÇÕES",
-    "🧾 Consulta de Pedidos"
-])
-
 # Aba 1: Consulta de Entradas
 with abas[0]:
     st.subheader("Consulta de Entradas")
@@ -55,68 +54,51 @@ with abas[0]:
                 st.dataframe(resultado)
             else:
                 st.warning("Nenhum resultado encontrado.")
+
     except Exception as e:
         st.error(f"Erro ao carregar dados de entradas: {e}")
 
-# Aba 2: Consulta de Produtos
+# Aba 2: Produtos (placeholder)
 with abas[1]:
     st.subheader("Consulta de Produtos")
     st.success("Planilha de produtos carregada com sucesso.")
-    dados_produtos = carregar_dados_google_sheet(sheet_id_produtos, 'Página1')
+    url = 'https://raw.githubusercontent.com/rafael011996/consulta/main/produtos.csv'
+    dados_produtos = carregar_dados_google_sheet(sheet_id_produtos, 'Página1')  # ou o nome correto da aba
 
     if not dados_produtos.empty:
-        dados_produtos = dados_produtos[[
-            'Produto', 'Produto Fornecedor', 'Descricao', 'Codigo Getin', 'Saldo',
-            'Multiplo', 'Fator Conversao', 'Data Ult. Compra', 'NCM', 'CEST', '% IPI'
-        ]]
+        dados_produtos = dados_produtos[['Produto', 'Produto Fornecedor', 'Descricao', 'Codigo Getin', 'Saldo', 'Multiplo', 'Fator Conversao', 'Data Ult. Compra', 'NCM', 'CEST', '% IPI']]
         consulta_produto = st.text_input('Digite o nome, código ou descrição do produto:', key="produto")
         if consulta_produto:
-            resultado = dados_produtos[dados_produtos.apply
+            resultado = dados_produtos[dados_produtos.apply(
                 lambda row: consulta_produto.lower() in str(row).lower(), axis=1)]
             st.dataframe(resultado if not resultado.empty else "Nenhum produto encontrado.")
-        else:
-            st.error("Erro ao carregar dados de produtos.")
+    else:
+        st.error("Erro ao carregar dados de produtos.")
 
-# Aba 3: Consulta de Cargas (com filtro por data adicionado)
+# Aba 3: Consulta de Cargas
 with abas[2]:
     st.subheader("Consulta de Cargas")
     st.success("Planilha de cargas carregada com sucesso.")
-    
-    tipo = st.radio("Tipo de carga:", ["CARGAS TCG", "CARGAS MCD"], horizontal=True)
-    dados_cargas = cargas_tcg if tipo == "CARGAS TCG" else cargas_mcd
+    col1, col2 = st.columns([1, 3])
+    with col1:
+        tipo_carga = st.radio("Tipo de carga:", ["CARGAS TCG", "CARGAS MCD"], horizontal=True)
+    with col2:
+        num_carga = st.text_input("Digite o número da carga:", key="carga")
 
-# Conversão segura da coluna DATA
-    if 'DATA' in dados_cargas.columns:
-        dados_cargas['DATA'] = 
-        dados_cargas['DATA']
-        .astype(str)
-        .str.replace(r'(\d{2})/(\d{2})/(\d{2})$', r'\1/\2/20\3', regex=True)
-        dados_cargas['DATA'] = pd.to_datetime(dados_cargas['DATA'], dayfirst=True, errors='coerce')
+    abas_meses = ['ABRIL/2025', 'MAIO/2025'] if tipo_carga == "CARGAS TCG" else ['04/ABRIL', '05/MAIO']
+    sheet_id = sheet_id_cargas_tcg if tipo_carga == "CARGAS TCG" else sheet_id_cargas_mcd
+    dados_cargas = carregar_dados_cargas(sheet_id, abas_meses)
 
-# Filtros
-       col1, col2 = st.columns([2, 3])
-
-with col1:
-    filtro_numero = st.text_input("Digite o número da carga:")
-
-with col2:
-    usar_data = st.checkbox("Filtrar por data?")
-    filtro_data = st.date_input("Filtrar por data:", datetime.date.today()) if usar_data else None
-
-# Aplicar filtros
-filtro = dados_cargas.copy()
-
-     if filtro_numero:
-        filtro = filtro[filtro['ID CARGAS'].astype(str).str.contains(filtro_numero)]
-
-     if usar_data and 'DATA' in filtro.columns:
-        filtro = filtro[filtro['DATA'].dt.date == filtro_data]
-
-# Exibir resultados
-     if filtro.empty:
-        st.warning("Nenhuma carga encontrada com os filtros aplicados.")
-     else:
-        st.dataframe(filtro, use_container_width=True)
+    if dados_cargas.empty:
+        st.error("Erro ao carregar dados de cargas.")
+    elif num_carga:
+        filtro = dados_cargas[dados_cargas.apply(lambda row: num_carga in str(row.values), axis=1)]
+        if not filtro.empty:
+            st.dataframe(filtro)
+        else:
+            st.warning("Nenhuma carga encontrada com esse número.")
+    else:
+        st.info("Digite o número da carga para iniciar a consulta.")
 
 # Aba 4: Motivos de Devoluções
 with abas[3]:
