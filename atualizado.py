@@ -61,6 +61,7 @@ with abas[0]:
 # Aba 2: Produtos (placeholder)
 with abas[1]:
     st.subheader("Consulta de Produtos")
+    st.success("Planilha de produtos carregada com sucesso.")
     url = 'https://raw.githubusercontent.com/rafael011996/consulta/main/produtos.csv'
     dados_produtos = carregar_dados_google_sheet(sheet_id_produtos, 'Página1')  # ou o nome correto da aba
 
@@ -77,6 +78,7 @@ with abas[1]:
 # Aba 3: Consulta de Cargas
 with abas[2]:
     st.subheader("Consulta de Cargas")
+    st.success("Planilha de cargas carregada com sucesso.")
     col1, col2 = st.columns([1, 3])
     with col1:
         tipo_carga = st.radio("Tipo de carga:", ["CARGAS TCG", "CARGAS MCD"], horizontal=True)
@@ -101,6 +103,7 @@ with abas[2]:
 # Aba 4: Motivos de Devoluções
 with abas[3]:
     st.subheader("Consulta de Motivos de Devoluções")
+    st.success("Planilha de ddevoluções carregada com sucesso.")
     dados_motivos = carregar_dados_cargas(sheet_id_cargas_dev, ["📥 MOTIVOS DE DEVOLUÇÕES"])
     if dados_motivos.empty:
         st.error("Erro ao carregar dados da aba de devoluções.")
