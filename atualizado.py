@@ -1,4 +1,4 @@
-import pandas as pd
+import pandas as pd 
 import streamlit as st
 import urllib.parse
 
@@ -54,17 +54,14 @@ with abas[0]:
                 st.dataframe(resultado)
             else:
                 st.warning("Nenhum resultado encontrado.")
-
     except Exception as e:
         st.error(f"Erro ao carregar dados de entradas: {e}")
 
-# Aba 2: Produtos (placeholder)
+# Aba 2: Consulta de Produtos
 with abas[1]:
     st.subheader("Consulta de Produtos")
     st.success("Planilha de produtos carregada com sucesso.")
-    url = 'https://raw.githubusercontent.com/rafael011996/consulta/main/produtos.csv'
-    dados_produtos = carregar_dados_google_sheet(sheet_id_produtos, 'Página1')  # ou o nome correto da aba
-
+    dados_produtos = carregar_dados_google_sheet(sheet_id_produtos, 'Página1')
     if not dados_produtos.empty:
         dados_produtos = dados_produtos[['Produto', 'Produto Fornecedor', 'Descricao', 'Codigo Getin', 'Saldo', 'Multiplo', 'Fator Conversao', 'Data Ult. Compra', 'NCM', 'CEST', '% IPI']]
         consulta_produto = st.text_input('Digite o nome, código ou descrição do produto:', key="produto")
@@ -79,11 +76,12 @@ with abas[1]:
 with abas[2]:
     st.subheader("Consulta de Cargas")
     st.success("Planilha de cargas carregada com sucesso.")
+    
     col1, col2 = st.columns([1, 3])
     with col1:
         tipo_carga = st.radio("Tipo de carga:", ["CARGAS TCG", "CARGAS MCD"], horizontal=True)
     with col2:
-        num_carga = st.text_input("Digite o número da carga:", key="carga")
+        num_carga = st.text_input("Digite o número da carga (opcional):", key="carga")
 
     abas_meses = ['ABRIL/2025', 'MAIO/2025'] if tipo_carga == "CARGAS TCG" else ['04/ABRIL', '05/MAIO']
     sheet_id = sheet_id_cargas_tcg if tipo_carga == "CARGAS TCG" else sheet_id_cargas_mcd
@@ -91,14 +89,33 @@ with abas[2]:
 
     if dados_cargas.empty:
         st.error("Erro ao carregar dados de cargas.")
-    elif num_carga:
-        filtro = dados_cargas[dados_cargas.apply(lambda row: num_carga in str(row.values), axis=1)]
-        if not filtro.empty:
-            st.dataframe(filtro)
-        else:
-            st.warning("Nenhuma carga encontrada com esse número.")
     else:
-        st.info("Digite o número da carga para iniciar a consulta.")
+        if tipo_carga == "CARGAS TCG":
+            if 'DATA' in dados_cargas.columns:
+                dados_cargas['DATA'] = pd.to_datetime(dados_cargas['DATA'], dayfirst=True, errors='coerce')
+
+            data_selecionada = st.date_input("Filtrar por data (opcional):", key="data_carga", format="DD/MM/YYYY")
+
+            filtro = dados_cargas.copy()
+            if num_carga:
+                filtro = filtro[filtro['ID CARGAS'].astype(str).str.contains(num_carga, na=False)]
+
+            if data_selecionada:
+                filtro = filtro[filtro['DATA'].dt.date == data_selecionada]
+
+            if not filtro.empty:
+                st.dataframe(filtro)
+            else:
+                st.warning("Nenhum resultado encontrado com os critérios selecionados.")
+        else:
+            if num_carga:
+                filtro = dados_cargas[dados_cargas.apply(lambda row: num_carga in str(row.values), axis=1)]
+                if not filtro.empty:
+                    st.dataframe(filtro)
+                else:
+                    st.warning("Nenhuma carga encontrada com esse número.")
+            else:
+                st.info("Digite o número da carga para iniciar a consulta.")
 
 # Aba 4: Motivos de Devoluções
 with abas[3]:
@@ -133,6 +150,5 @@ with abas[4]:
                 (dados_pedidos['Pedido'].astype(str) == pedido_input.strip())
             ]
             st.dataframe(resultado if not resultado.empty else "Nenhum pedido encontrado com esses dados.")
-
     except Exception as e:
         st.error(f"Erro ao carregar pedidos: {e}")
