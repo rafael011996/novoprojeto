@@ -59,7 +59,18 @@ with abas[0]:
 # Aba 2: Produtos (placeholder)
 with abas[1]:
     st.subheader("Consulta de Produtos")
-    st.info("Funcionalidade em desenvolvimento.")
+    url = 'https://raw.githubusercontent.com/rafael011996/consulta/main/produtos.csv'
+    dados_produtos = carregar_dados_csv(url)
+
+    if not dados_produtos.empty:
+        dados_produtos = dados_produtos[['Produto', 'Produto Fornecedor', 'Descricao', 'Codigo Getin', 'Saldo', 'Multiplo', 'Fator Conversao', 'Data Ult. Compra', 'NCM', 'CEST', '% IPI']]
+        consulta_produto = st.text_input('Digite o nome, código ou descrição do produto:', key="produto")
+        if consulta_produto:
+            resultado = dados_produtos[dados_produtos.apply(
+                lambda row: consulta_produto.lower() in str(row).lower(), axis=1)]
+            st.dataframe(resultado if not resultado.empty else "Nenhum produto encontrado.")
+    else:
+        st.error("Erro ao carregar dados de produtos.")
 
 # Aba 3: Consulta de Cargas
 with abas[2]:
