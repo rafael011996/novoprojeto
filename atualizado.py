@@ -87,7 +87,7 @@ with abas[2]:
 
 # Conversão segura da coluna DATA
     if 'DATA' in dados_cargas.columns:
-        dados_cargas['DATA'] = (
+        dados_cargas['DATA'] = 
         dados_cargas['DATA']
         .astype(str)
         .str.replace(r'(\d{2})/(\d{2})/(\d{2})$', r'\1/\2/20\3', regex=True)
