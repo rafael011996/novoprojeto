@@ -44,6 +44,7 @@ def carregar_dados_cargas(sheet_id, abas):
 # Aba 1: Consulta de Entradas
 with abas[0]:
     st.subheader("Consulta de Entradas")
+    st.success("Planilha de entradas carregada com sucesso.")
     try:
         dados_entradas = carregar_dados_google_sheet(sheet_id_entradas, 'Página1')
         consulta_nota = st.text_input('Digite o número da Nota:', key="nota")
