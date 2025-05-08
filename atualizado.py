@@ -83,19 +83,18 @@ with abas[2]:
     st.success("Planilha de cargas carregada com sucesso.")
     
     tipo = st.radio("Tipo de carga:", ["CARGAS TCG", "CARGAS MCD"], horizontal=True)
-dados_cargas = cargas_tcg if tipo == "CARGAS TCG" else cargas_mcd
+    dados_cargas = cargas_tcg if tipo == "CARGAS TCG" else cargas_mcd
 
 # Conversão segura da coluna DATA
-if 'DATA' in dados_cargas.columns:
-    dados_cargas['DATA'] = (
+    if 'DATA' in dados_cargas.columns:
+        dados_cargas['DATA'] = (
         dados_cargas['DATA']
         .astype(str)
         .str.replace(r'(\d{2})/(\d{2})/(\d{2})$', r'\1/\2/20\3', regex=True)
-    )
-    dados_cargas['DATA'] = pd.to_datetime(dados_cargas['DATA'], dayfirst=True, errors='coerce')
+        dados_cargas['DATA'] = pd.to_datetime(dados_cargas['DATA'], dayfirst=True, errors='coerce')
 
 # Filtros
-col1, col2 = st.columns([2, 3])
+       col1, col2 = st.columns([2, 3])
 
 with col1:
     filtro_numero = st.text_input("Digite o número da carga:")
@@ -107,17 +106,17 @@ with col2:
 # Aplicar filtros
 filtro = dados_cargas.copy()
 
-if filtro_numero:
-    filtro = filtro[filtro['ID CARGAS'].astype(str).str.contains(filtro_numero)]
+     if filtro_numero:
+        filtro = filtro[filtro['ID CARGAS'].astype(str).str.contains(filtro_numero)]
 
-if usar_data and 'DATA' in filtro.columns:
-    filtro = filtro[filtro['DATA'].dt.date == filtro_data]
+     if usar_data and 'DATA' in filtro.columns:
+        filtro = filtro[filtro['DATA'].dt.date == filtro_data]
 
 # Exibir resultados
-if filtro.empty:
-    st.warning("Nenhuma carga encontrada com os filtros aplicados.")
-else:
-    st.dataframe(filtro, use_container_width=True)
+     if filtro.empty:
+        st.warning("Nenhuma carga encontrada com os filtros aplicados.")
+     else:
+        st.dataframe(filtro, use_container_width=True)
 
 # Aba 4: Motivos de Devoluções
 with abas[3]:
