@@ -71,11 +71,11 @@ with abas[1]:
         ]]
         consulta_produto = st.text_input('Digite o nome, código ou descrição do produto:', key="produto")
         if consulta_produto:
-            resultado = dados_produtos[dados_produtos.apply(
+            resultado = dados_produtos[dados_produtos.apply
                 lambda row: consulta_produto.lower() in str(row).lower(), axis=1)]
             st.dataframe(resultado if not resultado.empty else "Nenhum produto encontrado.")
-    else:
-        st.error("Erro ao carregar dados de produtos.")
+        else:
+            st.error("Erro ao carregar dados de produtos.")
 
 # Aba 3: Consulta de Cargas (com filtro por data adicionado)
 with abas[2]:
