@@ -61,7 +61,7 @@ with abas[0]:
 with abas[1]:
     st.subheader("Consulta de Produtos")
     url = 'https://raw.githubusercontent.com/rafael011996/consulta/main/produtos.csv'
-    dados_produtos = carregar_dados_csv(sheet_id_produtos)
+    dados_produtos = carregar_dados_google_sheet(sheet_id_produtos, 'Página1')  # ou o nome correto da aba
 
     if not dados_produtos.empty:
         dados_produtos = dados_produtos[['Produto', 'Produto Fornecedor', 'Descricao', 'Codigo Getin', 'Saldo', 'Multiplo', 'Fator Conversao', 'Data Ult. Compra', 'NCM', 'CEST', '% IPI']]
