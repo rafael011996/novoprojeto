@@ -103,7 +103,7 @@ with abas[2]:
 # Aba 4: Motivos de Devoluções
 with abas[3]:
     st.subheader("Consulta de Motivos de Devoluções")
-    st.success("Planilha de ddevoluções carregada com sucesso.")
+    st.success("Planilha de devoluções carregada com sucesso.")
     dados_motivos = carregar_dados_cargas(sheet_id_cargas_dev, ["📥 MOTIVOS DE DEVOLUÇÕES"])
     if dados_motivos.empty:
         st.error("Erro ao carregar dados da aba de devoluções.")
