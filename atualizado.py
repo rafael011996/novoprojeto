@@ -10,6 +10,7 @@ sheet_id_cargas_tcg = '1TKCyEJ76ESHNTuczB0wMrnc_8z8j3_1LmR6Z9VnlZ7E'
 sheet_id_cargas_mcd = '1xlc9vqgg6PwqMAu7-pzQ1VM_ElxDqGNPYFWk8zRXuiE'
 sheet_id_cargas_dev = '1pUFv1VzcOI9-u0miYW1lfqDMlKHUbo0S2lq62GG3KtQ'
 sheet_id_pedidos = '1xlJhN6PRrd297dkKbxz9W9TVL_-HK5UeGjuKxm8-Rbg'
+sheet_id_produtos = '1PzkzkHwT5vv4u71KCNXpF-TFClzYKNngWHg13_wOR6o'
 
 # Título e abas
 st.title("Consultas TRIUNFANTE")
@@ -60,7 +61,7 @@ with abas[0]:
 with abas[1]:
     st.subheader("Consulta de Produtos")
     url = 'https://raw.githubusercontent.com/rafael011996/consulta/main/produtos.csv'
-    dados_produtos = carregar_dados_csv(url)
+    dados_produtos = carregar_dados_csv(sheet_id_produtos)
 
     if not dados_produtos.empty:
         dados_produtos = dados_produtos[['Produto', 'Produto Fornecedor', 'Descricao', 'Codigo Getin', 'Saldo', 'Multiplo', 'Fator Conversao', 'Data Ult. Compra', 'NCM', 'CEST', '% IPI']]
