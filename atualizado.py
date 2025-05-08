@@ -5,6 +5,7 @@ import urllib.parse
 st.set_page_config(page_title="Consultas TRIUNFANTE", layout="wide")
 
 # IDs das planilhas
+sheet_id_entrada_google = '1zk3sp8dazVU4qx_twI7oUe6l7ggTKzSkEmxAcYpoxqk'
 sheet_id_cargas_tcg = '1TKCyEJ76ESHNTuczB0wMrnc_8z8j3_1LmR6Z9VnlZ7E'
 sheet_id_cargas_mcd = '1xlc9vqgg6PwqMAu7-pzQ1VM_ElxDqGNPYFWk8zRXuiE'
 sheet_id_cargas_dev = '1pUFv1VzcOI9-u0miYW1lfqDMlKHUbo0S2lq62GG3KtQ'
@@ -12,9 +13,9 @@ sheet_id_cargas_dev = '1pUFv1VzcOI9-u0miYW1lfqDMlKHUbo0S2lq62GG3KtQ'
 # Título e abas
 st.title("Consultas TRIUNFANTE")
 abas = st.tabs([
-    "📥 Consulta de Entradas", 
-    "📦 Consulta de Produtos TCG E MCD", 
-    "🚚 Consulta de Cargas", 
+    "📥 Consulta de Entradas",
+    "📦 Consulta de Produtos TCG E MCD",
+    "🚚 Consulta de Cargas",
     "📥 MOTIVOS DE DEVOLUÇÕES"
 ])
 
@@ -40,27 +41,22 @@ def carregar_dados_cargas(sheet_id, abas):
             return pd.DataFrame()
     return pd.concat(frames, ignore_index=True) if frames else pd.DataFrame()
 
-# Aba 1: Entradas
-# Aba 1: Consulta por Nota em planilha do Google
-with abas[0]:
-    st.subheader("Consulta por Nota Fiscal de ENTRADAS")
-    
-    # ID da nova planilha de entrada
-    sheet_id_entrada_google = "1zk3sp8dazVU4qx_twI7oUe6l7ggTKzSkEmxAcYpoxqk"
-    aba_nome = "Página1"  # ajuste se o nome da aba for diferente
-    
-    @st.cache_data(ttl=0)
-    def carregar_dados_google_sheet(sheet_id, aba):
-        aba_codificada = urllib.parse.quote(aba, safe='')
-        url = f'https://docs.google.com/spreadsheets/d/{sheet_id}/gviz/tq?tqx=out:csv&sheet={aba_codificada}'
-        return pd.read_csv(url)
+@st.cache_data(ttl=0)
+def carregar_dados_google_sheet(sheet_id, aba):
+    aba_codificada = urllib.parse.quote(aba, safe='')
+    url = f'https://docs.google.com/spreadsheets/d/{sheet_id}/gviz/tq?tqx=out:csv&sheet={aba_codificada}'
+    return pd.read_csv(url)
 
+# Aba 1: Consulta de Entradas via Google Sheets
+with abas[0]:
+    st.subheader("Consulta por Nota Fiscal (Google Sheets)")
+
+    aba_nome = "Página1"  # Ajuste conforme o nome real da aba
     try:
         dados_entrada_sheet = carregar_dados_google_sheet(sheet_id_entrada_google, aba_nome)
         st.success("Planilha carregada com sucesso.")
-        
+
         nota_consulta = st.text_input("Digite o número da Nota Fiscal (coluna A):", key="nota_entrada")
-        
         if nota_consulta:
             resultado = dados_entrada_sheet[dados_entrada_sheet.iloc[:, 0].astype(str) == nota_consulta]
             if not resultado.empty:
@@ -69,7 +65,6 @@ with abas[0]:
                 st.warning("Nenhuma nota encontrada com esse número.")
     except Exception as e:
         st.error(f"Erro ao carregar dados da planilha: {e}")
-
 
 # Aba 2: Produtos
 with abas[1]:
