@@ -49,9 +49,9 @@ with abas[0]:
         if consulta_nota:
             resultado = dados_entradas[dados_entradas['Nota'].astype(str) == consulta_nota.strip()]
             if not resultado.empty:
-    st.dataframe(resultado)
-else:
-    st.warning("Nenhum resultado encontrado.")
+                st.dataframe(resultado)
+            else:
+                st.warning("Nenhum resultado encontrado.")
 
     except Exception as e:
         st.error(f"Erro ao carregar dados de entradas: {e}")
