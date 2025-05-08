@@ -9,6 +9,7 @@ sheet_id_entrada_google = '1zk3sp8dazVU4qx_twI7oUe6l7ggTKzSkEmxAcYpoxqk'
 sheet_id_cargas_tcg = '1TKCyEJ76ESHNTuczB0wMrnc_8z8j3_1LmR6Z9VnlZ7E'
 sheet_id_cargas_mcd = '1xlc9vqgg6PwqMAu7-pzQ1VM_ElxDqGNPYFWk8zRXuiE'
 sheet_id_cargas_dev = '1pUFv1VzcOI9-u0miYW1lfqDMlKHUbo0S2lq62GG3KtQ'
+sheet_id_pedidos = '1xlJhN6PRrd297dkKbxz9W9TVL_-HK5UeGjuKxm8-Rbg'
 
 # Título e abas
 st.title("Consultas TRIUNFANTE")
@@ -16,7 +17,8 @@ abas = st.tabs([
     "📥 Consulta de Entradas",
     "📦 Consulta de Produtos TCG E MCD",
     "🚚 Consulta de Cargas",
-    "📥 MOTIVOS DE DEVOLUÇÕES"
+    "📥 Motivos de Devoluções",
+    "📄 Consulta de Pedidos"
 ])
 
 # Funções de carregamento
@@ -47,14 +49,17 @@ def carregar_dados_google_sheet(sheet_id, aba):
     url = f'https://docs.google.com/spreadsheets/d/{sheet_id}/gviz/tq?tqx=out:csv&sheet={aba_codificada}'
     return pd.read_csv(url)
 
-# Aba 1: Consulta de Entradas via Google Sheets
+# Aba 1: Consulta de Entradas
 with abas[0]:
-    st.subheader("Consulta por Nota Fiscal (Google Sheets)")
+    st.subheader("Consulta de Entrada de Nota Fiscal ")
+    aba_nome = "Página1"  # Ajuste se necessário
 
-    aba_nome = "Página1"  # Ajuste conforme o nome real da aba
     try:
         dados_entrada_sheet = carregar_dados_google_sheet(sheet_id_entrada_google, aba_nome)
         st.success("Planilha carregada com sucesso.")
+
+        if 'CGC/CPF' in dados_entrada_sheet.columns:
+            dados_entrada_sheet['CGC/CPF'] = dados_entrada_sheet['CGC/CPF'].astype(str).str.replace(r'\.0$', '', regex=True).str.zfill(14)
 
         nota_consulta = st.text_input("Digite o número da Nota Fiscal (coluna A):", key="nota_entrada")
         if nota_consulta:
@@ -128,3 +133,32 @@ with abas[3]:
                 st.dataframe(resultado[colunas_exibir])
             else:
                 st.warning("Nenhum resultado encontrado para o código informado.")
+
+# Aba 5: Consulta de Pedidos
+with abas[4]:
+    st.subheader("Consulta de Pedidos")
+    aba_pedidos = "Página1"  # Altere se a aba tiver outro nome
+
+    try:
+        dados_pedidos = carregar_dados_google_sheet(sheet_id_pedidos, aba_pedidos)
+        st.success("Planilha de pedidos carregada com sucesso.")
+
+        col1, col2 = st.columns(2)
+        with col1:
+            repr_input = st.text_input("Digite o código do Representante (Repr):", key="repr")
+        with col2:
+            pedido_input = st.text_input("Digite o número do Pedido:", key="pedido")
+
+        if repr_input and pedido_input:
+            resultado = dados_pedidos[
+                dados_pedidos.apply(
+                    lambda row: str(repr_input) in str(row.values) and str(pedido_input) in str(row.values),
+                    axis=1
+                )
+            ]
+            if not resultado.empty:
+                st.dataframe(resultado)
+            else:
+                st.warning("Nenhum pedido encontrado com esses dados.")
+    except Exception as e:
+        st.error(f"Erro ao carregar pedidos: {e}")
