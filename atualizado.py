@@ -82,40 +82,42 @@ with abas[2]:
     st.subheader("Consulta de Cargas")
     st.success("Planilha de cargas carregada com sucesso.")
     
-    col1, col2 = st.columns([1, 3])
-    with col1:
-        tipo_carga = st.radio("Tipo de carga:", ["CARGAS TCG", "CARGAS MCD"], horizontal=True)
-    with col2:
-        num_carga = st.text_input("Digite o número da carga:", key="carga")
+    tipo = st.radio("Tipo de carga:", ["CARGAS TCG", "CARGAS MCD"], horizontal=True)
+dados_cargas = cargas_tcg if tipo == "CARGAS TCG" else cargas_mcd
 
-    abas_meses = ['ABRIL/2025', 'MAIO/2025'] if tipo_carga == "CARGAS TCG" else ['04/ABRIL', '05/MAIO']
-    sheet_id = sheet_id_cargas_tcg if tipo_carga == "CARGAS TCG" else sheet_id_cargas_mcd
+# Conversão segura da coluna DATA
+if 'DATA' in dados_cargas.columns:
+    dados_cargas['DATA'] = (
+        dados_cargas['DATA']
+        .astype(str)
+        .str.replace(r'(\d{2})/(\d{2})/(\d{2})$', r'\1/\2/20\3', regex=True)
+    )
+    dados_cargas['DATA'] = pd.to_datetime(dados_cargas['DATA'], dayfirst=True, errors='coerce')
 
-    dados_cargas = carregar_dados_cargas(sheet_id, abas_meses)
+# Filtros
+col1, col2 = st.columns([2, 3])
 
-    if dados_cargas.empty:
-        st.error("Erro ao carregar dados de cargas.")
-    else:
-        dados_cargas.columns = [col.strip().upper() for col in dados_cargas.columns]
+with col1:
+    filtro_numero = st.text_input("Digite o número da carga:")
 
-        col3, col4 = st.columns([1.2, 2])
-        with col3:
-            filtro_data = st.date_input("Filtrar por data:", key="filtro_data", format="DD/MM/YYYY")
-        with col4:
-            usar_data = st.checkbox("Filtrar por data?", value=False)
+with col2:
+    usar_data = st.checkbox("Filtrar por data?")
+    filtro_data = st.date_input("Filtrar por data:", datetime.date.today()) if usar_data else None
 
-        if usar_data and 'DATA' in dados_cargas.columns:
-            dados_cargas['DATA'] = pd.to_datetime(dados_cargas['DATA'], dayfirst=True, errors='coerce')
-            filtro = dados_cargas[dados_cargas['DATA'].dt.date == filtro_data]
-        elif num_carga:
-            filtro = dados_cargas[dados_cargas.apply(lambda row: num_carga in str(row.values), axis=1)]
-        else:
-            filtro = pd.DataFrame()
+# Aplicar filtros
+filtro = dados_cargas.copy()
 
-        if not filtro.empty:
-            st.dataframe(filtro)
-        else:
-            st.info("Nenhuma carga encontrada com os filtros aplicados.")
+if filtro_numero:
+    filtro = filtro[filtro['ID CARGAS'].astype(str).str.contains(filtro_numero)]
+
+if usar_data and 'DATA' in filtro.columns:
+    filtro = filtro[filtro['DATA'].dt.date == filtro_data]
+
+# Exibir resultados
+if filtro.empty:
+    st.warning("Nenhuma carga encontrada com os filtros aplicados.")
+else:
+    st.dataframe(filtro, use_container_width=True)
 
 # Aba 4: Motivos de Devoluções
 with abas[3]:
