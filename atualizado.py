@@ -48,7 +48,11 @@ with abas[0]:
         consulta_nota = st.text_input('Digite o número da Nota:', key="nota")
         if consulta_nota:
             resultado = dados_entradas[dados_entradas['Nota'].astype(str) == consulta_nota.strip()]
-            st.dataframe(resultado if not resultado.empty else "Nenhum resultado encontrado.")
+            if not resultado.empty:
+    st.dataframe(resultado)
+else:
+    st.warning("Nenhum resultado encontrado.")
+
     except Exception as e:
         st.error(f"Erro ao carregar dados de entradas: {e}")
 
