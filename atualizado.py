@@ -117,18 +117,23 @@ with abas[3]:
         st.info("Digite o número da carga para iniciar a consulta.")
 
 # Aba 5: Motivos de Devoluções
-# Aba 5: Motivos de Devoluções
 with abas[4]:
     st.subheader("Consulta de Motivos de Devoluções")
     dados_motivos = carregar_dados_cargas(sheet_id_cargas_dev, ["📥 MOTIVOS DE DEVOLUÇÕES"])
-    
+
     if dados_motivos.empty:
         st.error("Erro ao carregar dados da aba de devoluções.")
     else:
         st.success("Planilha de devoluções carregada com sucesso.")
         
-        numero_codigo = st.text_input("Digite o número do código de devolução (após 'DEV-'):", key="codigo_dev")
+        st.markdown("**Digite o número do código de devolução (após 'DEV-'):**")
+        col1, col2 = st.columns([1, 5])
         
+        with col1:
+            st.text_input("Prefixo", value="DEV-", disabled=True, label_visibility="collapsed")
+        with col2:
+            numero_codigo = st.text_input("Código", key="codigo_dev", label_visibility="collapsed")
+
         if numero_codigo:
             codigo_completo = f"DEV-{numero_codigo.strip()}"
             resultado = dados_motivos[dados_motivos.iloc[:, 9].astype(str).str.contains(codigo_completo, na=False)]
@@ -138,6 +143,7 @@ with abas[4]:
                 st.dataframe(resultado[colunas_exibir])
             else:
                 st.warning("Nenhum resultado encontrado.")
+
 
 
 # Aba 6: Consulta de Pedidos
