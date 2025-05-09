@@ -13,8 +13,8 @@ sheet_id_pedidos = '1xlJhN6PRrd297dkKbxz9W9TVL_-HK5UeGjuKxm8-Rbg'
 sheet_id_produtos = '1PzkzkHwT5vv4u71KCNXpF-TFClzYKNngWHg13_wOR6o'
 sheet_id_produtosmcd = '1dxvHYgcC8x53li2vCmVY8VVlighWSa4dAjHx7gQPF-0'
 
-# Título e abas
 st.title("Consultas TRIUNFANTE")
+
 abas = st.tabs([
     "📥 Consulta de Entradas TCG e MCD",
     "📦 Consulta de Produtos TCG",
@@ -24,7 +24,6 @@ abas = st.tabs([
     "🧾 Consulta de Pedidos TCG e MCD"
 ])
 
-# Funções de carregamento
 @st.cache_data(ttl=0)
 def carregar_dados_google_sheet(sheet_id, aba):
     aba_codificada = urllib.parse.quote(aba, safe='')
@@ -46,9 +45,9 @@ def carregar_dados_cargas(sheet_id, abas):
 # Aba 1: Consulta de Entradas
 with abas[0]:
     st.subheader("Consulta de Entradas")
-    st.success("Planilha de entradas carregada com sucesso.")
     try:
         dados_entradas = carregar_dados_google_sheet(sheet_id_entradas, 'Página1')
+        st.success("Planilha de entradas carregada com sucesso.")
         consulta_nota = st.text_input('Digite o número da Nota:', key="nota")
         if consulta_nota:
             resultado = dados_entradas[dados_entradas['Nota'].astype(str) == consulta_nota.strip()]
@@ -56,45 +55,46 @@ with abas[0]:
                 st.dataframe(resultado)
             else:
                 st.warning("Nenhum resultado encontrado.")
-
     except Exception as e:
         st.error(f"Erro ao carregar dados de entradas: {e}")
 
-# Aba 2: Produtos (placeholder)
+# Aba 2: Produtos TCG
 with abas[1]:
     st.subheader("Consulta de Produtos TCG")
-    st.success("Planilha de produtos carregada com sucesso.")
-    dados_produtos = carregar_dados_google_sheet(sheet_id_produtos, 'Página1')  # ou o nome correto da aba
-
+    dados_produtos = carregar_dados_google_sheet(sheet_id_produtos, 'Página1')
     if not dados_produtos.empty:
+        st.success("Planilha de produtos carregada com sucesso.")
         dados_produtos = dados_produtos[['Produto', 'Produto Fornecedor', 'Descricao', 'Codigo Getin', 'Saldo', 'Multiplo', 'Fator Conversao', 'Data Ult. Compra', 'NCM', 'CEST', '% IPI']]
         consulta_produto = st.text_input('Digite o nome, código ou descrição do produto:', key="produto_tcg")
         if consulta_produto:
-            resultado = dados_produtos[dados_produtos.apply(
-                lambda row: consulta_produto.lower() in str(row).lower(), axis=1)]
-            st.dataframe(resultado if not resultado.empty else "Nenhum produto encontrado.")
+            resultado = dados_produtos[dados_produtos.apply(lambda row: consulta_produto.lower() in str(row).lower(), axis=1)]
+            if not resultado.empty:
+                st.dataframe(resultado)
+            else:
+                st.warning("Nenhum produto encontrado.")
     else:
         st.error("Erro ao carregar dados de produtos.")
-        
+
+# Aba 3: Produtos MCD
 with abas[2]:
     st.subheader("Consulta de Produtos MCD")
-    st.success("Planilha de produtos carregada com sucesso.")
-    dados_produtos = carregar_dados_google_sheet(sheet_id_produtosmcd, 'Página1')  # ou o nome correto da aba
-
+    dados_produtos = carregar_dados_google_sheet(sheet_id_produtosmcd, 'Página1')
     if not dados_produtos.empty:
+        st.success("Planilha de produtos carregada com sucesso.")
         dados_produtos = dados_produtos[['Produto', 'Produto Fornecedor', 'Descricao', 'Codigo Getin', 'Saldo', 'Multiplo', 'Fator Conversao', 'Data Ult. Compra', 'NCM', 'CEST', '% IPI']]
         consulta_produto = st.text_input('Digite o nome, código ou descrição do produto:', key="produto_mcd")
         if consulta_produto:
-            resultado = dados_produtos[dados_produtos.apply(
-                lambda row: consulta_produto.lower() in str(row).lower(), axis=1)]
-            st.dataframe(resultado if not resultado.empty else "Nenhum produto encontrado.")
+            resultado = dados_produtos[dados_produtos.apply(lambda row: consulta_produto.lower() in str(row).lower(), axis=1)]
+            if not resultado.empty:
+                st.dataframe(resultado)
+            else:
+                st.warning("Nenhum produto encontrado.")
     else:
         st.error("Erro ao carregar dados de produtos.")
 
-# Aba 3: Consulta de Cargas
+# Aba 4: Consulta de Cargas
 with abas[3]:
     st.subheader("Consulta de Cargas")
-    st.success("Planilha de cargas carregada com sucesso.")
     col1, col2 = st.columns([1, 3])
     with col1:
         tipo_carga = st.radio("Tipo de carga:", ["CARGAS TCG", "CARGAS MCD"], horizontal=True)
@@ -116,38 +116,42 @@ with abas[3]:
     else:
         st.info("Digite o número da carga para iniciar a consulta.")
 
-# Aba 4: Motivos de Devoluções
+# Aba 5: Motivos de Devoluções
 with abas[4]:
     st.subheader("Consulta de Motivos de Devoluções")
-    st.success("Planilha de devoluções carregada com sucesso.")
     dados_motivos = carregar_dados_cargas(sheet_id_cargas_dev, ["📥 MOTIVOS DE DEVOLUÇÕES"])
     if dados_motivos.empty:
         st.error("Erro ao carregar dados da aba de devoluções.")
     else:
+        st.success("Planilha de devoluções carregada com sucesso.")
         consulta_codigo = st.text_input("Digite o código de devolução (coluna J):", key="codigo_dev")
         if consulta_codigo:
             resultado = dados_motivos[dados_motivos.iloc[:, 9].astype(str).str.contains(consulta_codigo, na=False)]
             colunas_exibir = list(resultado.columns[:9])
-            st.dataframe(resultado[colunas_exibir] if not resultado.empty else "Nenhum resultado encontrado.")
+            if not resultado.empty:
+                st.dataframe(resultado[colunas_exibir])
+            else:
+                st.warning("Nenhum resultado encontrado.")
 
-# Aba 5: Consulta de Pedidos
+# Aba 6: Consulta de Pedidos
 with abas[5]:
     st.subheader("Consulta de Pedidos")
     try:
         dados_pedidos = carregar_dados_google_sheet(sheet_id_pedidos, 'Página1')
         st.success("Planilha de pedidos carregada com sucesso.")
-
         col1, col2 = st.columns(2)
         with col1:
             repr_input = st.text_input("Digite o código do Representante:", key="repr")
+        with col2:
             pedido_input = st.text_input("Digite o número do Pedido:", key="pedido")
-
         if repr_input and pedido_input:
             resultado = dados_pedidos[
                 (dados_pedidos['Repr'].astype(str) == repr_input.strip()) &
                 (dados_pedidos['Pedido'].astype(str) == pedido_input.strip())
             ]
-            st.dataframe(resultado if not resultado.empty else "Nenhum pedido encontrado com esses dados.")
-
+            if not resultado.empty:
+                st.dataframe(resultado)
+            else:
+                st.warning("Nenhum pedido encontrado com esses dados.")
     except Exception as e:
         st.error(f"Erro ao carregar pedidos: {e}")
