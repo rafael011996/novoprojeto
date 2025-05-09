@@ -68,7 +68,7 @@ with abas[1]:
 
     if not dados_produtos.empty:
         dados_produtos = dados_produtos[['Produto', 'Produto Fornecedor', 'Descricao', 'Codigo Getin', 'Saldo', 'Multiplo', 'Fator Conversao', 'Data Ult. Compra', 'NCM', 'CEST', '% IPI']]
-        consulta_produto = st.text_input('Digite o nome, código ou descrição do produto:', key="produto")
+        consulta_produto = st.text_input('Digite o nome, código ou descrição do produto:', key="produto_tcg")
         if consulta_produto:
             resultado = dados_produtos[dados_produtos.apply(
                 lambda row: consulta_produto.lower() in str(row).lower(), axis=1)]
@@ -83,7 +83,7 @@ with abas[2]:
 
     if not dados_produtos.empty:
         dados_produtos = dados_produtos[['Produto', 'Produto Fornecedor', 'Descricao', 'Codigo Getin', 'Saldo', 'Multiplo', 'Fator Conversao', 'Data Ult. Compra', 'NCM', 'CEST', '% IPI']]
-        consulta_produto = st.text_input('Digite o nome, código ou descrição do produto:', key="produto")
+        consulta_produto = st.text_input('Digite o nome, código ou descrição do produto:', key="produto_mcd")
         if consulta_produto:
             resultado = dados_produtos[dados_produtos.apply(
                 lambda row: consulta_produto.lower() in str(row).lower(), axis=1)]
