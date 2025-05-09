@@ -11,15 +11,17 @@ sheet_id_cargas_mcd = '1xlc9vqgg6PwqMAu7-pzQ1VM_ElxDqGNPYFWk8zRXuiE'
 sheet_id_cargas_dev = '1pUFv1VzcOI9-u0miYW1lfqDMlKHUbo0S2lq62GG3KtQ'
 sheet_id_pedidos = '1xlJhN6PRrd297dkKbxz9W9TVL_-HK5UeGjuKxm8-Rbg'
 sheet_id_produtos = '1PzkzkHwT5vv4u71KCNXpF-TFClzYKNngWHg13_wOR6o'
+sheet_id_produtosmcd = '1dxvHYgcC8x53li2vCmVY8VVlighWSa4dAjHx7gQPF-0'
 
 # Título e abas
 st.title("Consultas TRIUNFANTE")
 abas = st.tabs([
-    "📥 Consulta de Entradas",
-    "📦 Consulta de Produtos TCG E MCD",
+    "📥 Consulta de Entradas TCG e MCD",
+    "📦 Consulta de Produtos TCG",
+    "📦 Consulta de Produtos MCD",
     "🚚 Consulta de Cargas",
-    "📥 MOTIVOS DE DEVOLUÇÕES",
-    "🧾 Consulta de Pedidos"
+    "📥 MOTIVOS DE DEVOLUÇÕES TCG e MCD",
+    "🧾 Consulta de Pedidos TCG e MCD"
 ])
 
 # Funções de carregamento
@@ -60,7 +62,7 @@ with abas[0]:
 
 # Aba 2: Produtos (placeholder)
 with abas[1]:
-    st.subheader("Consulta de Produtos")
+    st.subheader("Consulta de Produtos TCG")
     st.success("Planilha de produtos carregada com sucesso.")
     url = 'https://raw.githubusercontent.com/rafael011996/consulta/main/produtos.csv'
     dados_produtos = carregar_dados_google_sheet(sheet_id_produtos, 'Página1')  # ou o nome correto da aba
@@ -74,9 +76,25 @@ with abas[1]:
             st.dataframe(resultado if not resultado.empty else "Nenhum produto encontrado.")
     else:
         st.error("Erro ao carregar dados de produtos.")
+        
+with abas[2]:
+    st.subheader("Consulta de Produtos MCD")
+    st.success("Planilha de produtos carregada com sucesso.")
+    url = 'https://raw.githubusercontent.com/rafael011996/consulta/main/produtos.csv'
+    dados_produtos = carregar_dados_google_sheet(sheet_id_produtosmcd, 'Página1')  # ou o nome correto da aba
+
+    if not dados_produtos.empty:
+        dados_produtos = dados_produtos[['Produto', 'Produto Fornecedor', 'Descricao', 'Codigo Getin', 'Saldo', 'Multiplo', 'Fator Conversao', 'Data Ult. Compra', 'NCM', 'CEST', '% IPI']]
+        consulta_produto = st.text_input('Digite o nome, código ou descrição do produto:', key="produto")
+        if consulta_produto:
+            resultado = dados_produtos[dados_produtos.apply(
+                lambda row: consulta_produto.lower() in str(row).lower(), axis=1)]
+            st.dataframe(resultado if not resultado.empty else "Nenhum produto encontrado.")
+    else:
+        st.error("Erro ao carregar dados de produtos.")
 
 # Aba 3: Consulta de Cargas
-with abas[2]:
+with abas[3]:
     st.subheader("Consulta de Cargas")
     st.success("Planilha de cargas carregada com sucesso.")
     col1, col2 = st.columns([1, 3])
