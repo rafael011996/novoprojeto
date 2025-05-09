@@ -117,7 +117,7 @@ with abas[3]:
         st.info("Digite o número da carga para iniciar a consulta.")
 
 # Aba 4: Motivos de Devoluções
-with abas[3]:
+with abas[4]:
     st.subheader("Consulta de Motivos de Devoluções")
     st.success("Planilha de devoluções carregada com sucesso.")
     dados_motivos = carregar_dados_cargas(sheet_id_cargas_dev, ["📥 MOTIVOS DE DEVOLUÇÕES"])
@@ -131,7 +131,7 @@ with abas[3]:
             st.dataframe(resultado[colunas_exibir] if not resultado.empty else "Nenhum resultado encontrado.")
 
 # Aba 5: Consulta de Pedidos
-with abas[4]:
+with abas[5]:
     st.subheader("Consulta de Pedidos")
     try:
         dados_pedidos = carregar_dados_google_sheet(sheet_id_pedidos, 'Página1')
