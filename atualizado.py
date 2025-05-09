@@ -127,7 +127,7 @@ with abas[4]:
         consulta_codigo = st.text_input("Digite o código de devolução (coluna J):", key="codigo_dev")
         if consulta_codigo:
             codigo_completo = f"DEV-{numero_codigo.strip()}"
-            resultado = dados_motivos[dados_motivos.iloc[:, 10].astype(str).str.contains(consulta_codigo, na=False)]
+            resultado = dados_motivos[dados_motivos.iloc[:, 9].astype(str).str.contains(consulta_codigo, na=False)]
             colunas_exibir = list(resultado.columns[:9])
             if not resultado.empty:
                 st.dataframe(resultado[colunas_exibir])
