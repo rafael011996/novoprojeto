@@ -124,7 +124,6 @@ with abas[4]:
         col1, col2 = st.columns(2)
         with col1:
             repr_input = st.text_input("Digite o código do Representante (Repr):", key="repr")
-        with col2:
             pedido_input = st.text_input("Digite o número do Pedido:", key="pedido")
 
         if repr_input and pedido_input:
