@@ -64,7 +64,6 @@ with abas[0]:
 with abas[1]:
     st.subheader("Consulta de Produtos TCG")
     st.success("Planilha de produtos carregada com sucesso.")
-    url = 'https://raw.githubusercontent.com/rafael011996/consulta/main/produtos.csv'
     dados_produtos = carregar_dados_google_sheet(sheet_id_produtos, 'Página1')  # ou o nome correto da aba
 
     if not dados_produtos.empty:
