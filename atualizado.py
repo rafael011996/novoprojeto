@@ -94,27 +94,33 @@ with abas[2]:
 
 # Aba 4: Consulta de Cargas
 with abas[3]:
-    st.subheader("Consulta de Cargas")
-    col1, col2 = st.columns([1, 3])
-    with col1:
-        tipo_carga = st.radio("Tipo de carga:", ["CARGAS TCG", "CARGAS MCD"], horizontal=True)
-    with col2:
-        num_carga = st.text_input("Digite o número da carga:", key="carga")
+    st.header("🔍 Consulta de Cargas")
 
-    abas_meses = ['ABRIL/2025', 'MAIO/2025'] if tipo_carga == "CARGAS TCG" else ['04/ABRIL', '05/MAIO']
-    sheet_id = sheet_id_cargas_tcg if tipo_carga == "CARGAS TCG" else sheet_id_cargas_mcd
-    dados_cargas = carregar_dados_cargas(sheet_id, abas_meses)
+if dados_cargas.empty:
+    st.error("Erro ao carregar dados de cargas.")
+else:
+    # Caixa de seleção de status
+    status_opcoes = dados_cargas['STATUS'].dropna().unique().tolist()
+    status_escolhido = st.selectbox("Filtrar por Status da Carga:", [""] + sorted(status_opcoes), key="filtro_status")
 
-    if dados_cargas.empty:
-        st.error("Erro ao carregar dados de cargas.")
-    elif num_carga:
-        filtro = dados_cargas[dados_cargas.apply(lambda row: num_carga in str(row.values), axis=1)]
-        if not filtro.empty:
-            st.dataframe(filtro)
-        else:
-            st.warning("Nenhuma carga encontrada com esse número.")
+    # Campo opcional para número da carga
+    num_carga = st.text_input("Digite o número da carga (opcional):")
+
+    # Aplica filtros
+    filtro = dados_cargas.copy()
+
+    if status_escolhido:
+        filtro = filtro[filtro['STATUS'].astype(str).str.upper() == status_escolhido.upper()]
+
+    if num_carga:
+        filtro = filtro[filtro.apply(lambda row: num_carga in str(row.values), axis=1)]
+
+    # Exibe resultados
+    if not filtro.empty:
+        st.dataframe(filtro)
     else:
-        st.info("Digite o número da carga para iniciar a consulta.")
+        st.warning("Nenhum resultado encontrado com os filtros aplicados.")
+
 
 # Aba 5: Motivos de Devoluções
 with abas[4]:
