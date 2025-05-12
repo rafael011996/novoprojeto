@@ -154,11 +154,11 @@ if aba == "Consulta de Pedidos":
     col1, col2, col3 = st.columns(3)
 
     with col1:
-        repr_input = st.text_input("Digite o código do Representante:", key="repr")
+        repr_input = st.text_input("Digite o código do Representante:")
     with col2:
-        pedido_input = st.text_input("Digite o número do Pedido:", key="pedido")
+        pedido_input = st.text_input("Digite o número do Pedido:")
     with col3:
-        nota_input = st.text_input("Digite o número da Nota Fiscal:", key="nota_pedido")
+        nota_input = st.text_input("Digite o número da Nota Fiscal:")
 
     if repr_input or pedido_input or nota_input:
         resultado = dados_pedidos[
@@ -169,6 +169,6 @@ if aba == "Consulta de Pedidos":
         if not resultado.empty:
             st.dataframe(resultado)
         else:
-            st.warning("Nenhum resultado encontrado com os dados informados.")
+            st.warning("Nenhum resultado encontrado.")
 
 
