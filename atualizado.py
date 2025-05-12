@@ -93,7 +93,6 @@ with abas[2]:
         st.error("Erro ao carregar dados de produtos.")
 
 # Aba 4: Consulta de Cargas
-# Aba 4: Consulta de Cargas
 with abas[3]:
     st.header("🔍 Consulta de Cargas")
 
@@ -102,26 +101,12 @@ with abas[3]:
     if dados_cargas.empty:
         st.error("Erro ao carregar dados de cargas.")
     else:
-        dados_cargas['DATA'] = pd.to_datetime(dados_cargas['DATA'], errors='coerce', dayfirst=True)
-
-        col1, col2, col3 = st.columns(3)
-
-        with col1:
-            data_inicial = st.date_input("Data inicial:", value=pd.to_datetime("2025-04-01"))
-        with col2:
-            data_final = st.date_input("Data final:", value=pd.to_datetime("2025-05-31"))
-        with col3:
-            status_opcoes = dados_cargas['STATUS'].dropna().unique().tolist()
-            status_escolhido = st.selectbox("Status da Carga:", [""] + sorted(status_opcoes), key="filtro_status")
+        status_opcoes = dados_cargas['STATUS'].dropna().unique().tolist()
+        status_escolhido = st.selectbox("Filtrar por Status da Carga:", [""] + sorted(status_opcoes), key="filtro_status")
 
         num_carga = st.text_input("Digite o número da carga (opcional):")
 
-        # Aplicando os filtros
         filtro = dados_cargas.copy()
-        filtro = filtro[
-            (filtro['DATA'] >= pd.to_datetime(data_inicial)) &
-            (filtro['DATA'] <= pd.to_datetime(data_final))
-        ]
 
         if status_escolhido:
             filtro = filtro[filtro['STATUS'].astype(str).str.upper() == status_escolhido.upper()]
@@ -133,9 +118,6 @@ with abas[3]:
             st.dataframe(filtro)
         else:
             st.warning("Nenhum resultado encontrado com os filtros aplicados.")
-
-
-
 
 # Aba 5: Motivos de Devoluções
 with abas[4]:
