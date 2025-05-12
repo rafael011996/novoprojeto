@@ -153,22 +153,26 @@ with abas[5]:
     try:
         dados_pedidos = carregar_dados_google_sheet(sheet_id_pedidos, 'Página1')
         st.success("Planilha de pedidos carregada com sucesso.")
-               col1, col2, col3 = st.columns(3)
-        with col1:
-            repr_input = st.text_input("Digite o código do Representante:", key="repr")
-        with col2:
-            pedido_input = st.text_input("Digite o número do Pedido:", key="pedido")
-        with col3:
-            nota_input = st.text_input("Digite o número da Nota Fiscal:", key="nota_pedido")
+               st.subheader("Consulta de Pedidos")
+
+    col1, col2, col3 = st.columns(3)
+
+    with col1:
+    repr_input = st.text_input("Digite o código do Representante:", key="repr")
+    with col2:
+    pedido_input = st.text_input("Digite o número do Pedido:", key="pedido")
+    with col3:
+    nota_input = st.text_input("Digite o número da Nota Fiscal:", key="nota_pedido")
 
         if repr_input or pedido_input or nota_input:
-            resultado = dados_pedidos[
-                (dados_pedidos['Repr'].astype(str) == repr_input.strip()) |
-                (dados_pedidos['Pedido'].astype(str) == pedido_input.strip()) |
-                (dados_pedidos['Nota'].astype(str) == nota_input.strip())
-            ]
-            if not resultado.empty:
-                st.dataframe(resultado)
-            else:
-                st.warning("Nenhum resultado encontrado com os dados informados.")
+    resultado = dados_pedidos[
+        (dados_pedidos['Repr'].astype(str) == repr_input.strip()) |
+        (dados_pedidos['Pedido'].astype(str) == pedido_input.strip()) |
+        (dados_pedidos['Nota'].astype(str) == nota_input.strip())
+    ]
+       if not resultado.empty:
+        st.dataframe(resultado)
+    else:
+        st.warning("Nenhum resultado encontrado com os dados informados.")
+
 
