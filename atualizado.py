@@ -96,31 +96,28 @@ with abas[2]:
 with abas[3]:
     st.header("🔍 Consulta de Cargas")
 
+    dados_cargas = carregar_dados_cargas(sheet_id_cargas_tcg, ['ABRIL/2025', 'MAIO/2025'])
+
     if dados_cargas.empty:
         st.error("Erro ao carregar dados de cargas.")
     else:
-    # Caixa de seleção de status
         status_opcoes = dados_cargas['STATUS'].dropna().unique().tolist()
         status_escolhido = st.selectbox("Filtrar por Status da Carga:", [""] + sorted(status_opcoes), key="filtro_status")
 
-    # Campo opcional para número da carga
         num_carga = st.text_input("Digite o número da carga (opcional):")
 
-    # Aplica filtros
         filtro = dados_cargas.copy()
 
-    if status_escolhido:
-        filtro = filtro[filtro['STATUS'].astype(str).str.upper() == status_escolhido.upper()]
+        if status_escolhido:
+            filtro = filtro[filtro['STATUS'].astype(str).str.upper() == status_escolhido.upper()]
 
-    if num_carga:
-        filtro = filtro[filtro.apply(lambda row: num_carga in str(row.values), axis=1)]
+        if num_carga:
+            filtro = filtro[filtro.apply(lambda row: num_carga in str(row.values), axis=1)]
 
-    # Exibe resultados
-    if not filtro.empty:
-        st.dataframe(filtro)
-    else:
-        st.warning("Nenhum resultado encontrado com os filtros aplicados.")
-
+        if not filtro.empty:
+            st.dataframe(filtro)
+        else:
+            st.warning("Nenhum resultado encontrado com os filtros aplicados.")
 
 # Aba 5: Motivos de Devoluções
 with abas[4]:
@@ -149,8 +146,6 @@ with abas[4]:
                 st.dataframe(resultado[colunas_exibir])
             else:
                 st.warning("Nenhum resultado encontrado.")
-
-
 
 # Aba 6: Consulta de Pedidos
 with abas[5]:
