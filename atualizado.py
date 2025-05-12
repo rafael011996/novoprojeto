@@ -148,7 +148,7 @@ with abas[4]:
                 st.warning("Nenhum resultado encontrado.")
 
 # Aba 6: Consulta de Pedidos
-if aba == "Consulta de Pedidos":
+with abas[5]:
     st.subheader("Consulta de Pedidos")
 
     col1, col2, col3 = st.columns(3)
