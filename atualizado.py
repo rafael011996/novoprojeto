@@ -96,18 +96,18 @@ with abas[2]:
 with abas[3]:
     st.header("🔍 Consulta de Cargas")
 
-if dados_cargas.empty:
-    st.error("Erro ao carregar dados de cargas.")
-else:
+    if dados_cargas.empty:
+        st.error("Erro ao carregar dados de cargas.")
+    else:
     # Caixa de seleção de status
-    status_opcoes = dados_cargas['STATUS'].dropna().unique().tolist()
-    status_escolhido = st.selectbox("Filtrar por Status da Carga:", [""] + sorted(status_opcoes), key="filtro_status")
+        status_opcoes = dados_cargas['STATUS'].dropna().unique().tolist()
+        status_escolhido = st.selectbox("Filtrar por Status da Carga:", [""] + sorted(status_opcoes), key="filtro_status")
 
     # Campo opcional para número da carga
-    num_carga = st.text_input("Digite o número da carga (opcional):")
+        num_carga = st.text_input("Digite o número da carga (opcional):")
 
     # Aplica filtros
-    filtro = dados_cargas.copy()
+        filtro = dados_cargas.copy()
 
     if status_escolhido:
         filtro = filtro[filtro['STATUS'].astype(str).str.upper() == status_escolhido.upper()]
