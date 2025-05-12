@@ -161,7 +161,7 @@ with abas[5]:
         with col2:
             pedido_input = st.text_input("Digite o número do Pedido:", key="pedido")
         with col3:
-            nota_input = st.text_input("Digite o número da Nota Fiscal:", key="nota")
+            nota_input = st.text_input("Digite o número da Nota Fiscal:", key="Nota")
 
         # Filtro de busca
         if repr_input or pedido_input or nota_input:
