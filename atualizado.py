@@ -191,7 +191,7 @@ with abas[6]:
         codigo_rca = st.text_input("Digite o código do Representante (Repr):", key="consulta_rca")
 
         if codigo_rca:
-            resultado = dados_rca[dados_rca['Repr'].astype(str) == codigo_rca.strip()]
+            resultado = dados_rca[dados_rca['CODIGO'].astype(str) == codigo_rca.strip()]
             if not resultado.empty:
                 st.dataframe(resultado)
             else:
