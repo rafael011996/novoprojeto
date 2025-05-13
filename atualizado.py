@@ -21,7 +21,7 @@ abas = st.tabs([
     "📦 Consulta de Produtos MCD",
     "🚚 Consulta de Cargas",
     "📥 MOTIVOS DE DEVOLUÇÕES TCG e MCD",
-    "🧾 Consulta de Pedidos TCG e MCD"
+    "🧾 Consulta de Pedidos TCG e MCD",
     "🧑‍💼 Consulta RCA"
 ])
 
@@ -179,14 +179,16 @@ with abas[5]:
     except Exception as e:
         st.error(f"Erro ao carregar pedidos: {e}")
 
+# Aba 7: Consulta RCA
 with abas[6]:
-        st.subheader("Consulta de Representantes (RCA)")  
-        sheet_id_rca = "1Y-zO5l5b1r84XU6rYgWkXUDbn2tkYRWWgDAh1dPtkUE"
-        try:
-            dados_rca = carregar_dados_google_sheet(sheet_id_rca, 'Página1')
-            st.success("Planilha de representantes carregada com sucesso.")
+    st.subheader("Consulta de Representantes (RCA)")  
+    sheet_id_rca = "1Y-zO5l5b1r84XU6rYgWkXUDbn2tkYRWWgDAh1dPtkUE"
 
-            codigo_rca = st.text_input("Digite o código do Representante (Repr):", key="consulta_rca")
+    try:
+        dados_rca = carregar_dados_google_sheet(sheet_id_rca, 'Página1')
+        st.success("Planilha de representantes carregada com sucesso.")
+
+        codigo_rca = st.text_input("Digite o código do Representante (Repr):", key="consulta_rca")
 
         if codigo_rca:
             resultado = dados_rca[dados_rca['Repr'].astype(str) == codigo_rca.strip()]
@@ -196,6 +198,7 @@ with abas[6]:
                 st.warning("Nenhum representante encontrado com esse código.")
     except Exception as e:
         st.error(f"Erro ao carregar dados de representantes: {e}")
+
 
 
 
