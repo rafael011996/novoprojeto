@@ -184,7 +184,7 @@ with abas[5]:
     
     sheet_id_rca = "1Y-zO5l5b1r84XU6rYgWkXUDbn2tkYRWWgDAh1dPtkUE"
 
-    try:
+        try:
         dados_rca = carregar_dados_google_sheet(sheet_id_rca, 'Página1')
         st.success("Planilha de representantes carregada com sucesso.")
 
