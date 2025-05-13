@@ -23,8 +23,8 @@ abas = st.tabs([
     "🚚 Consulta de Cargas",
     "📥 MOTIVOS DE DEVOLUÇÕES TCG e MCD",
     "🧾 Consulta de Pedidos TCG e MCD",
-    "📥 Consulta de NF SERVIÇO TCG e MCD",
-    "🧑‍💼 Consulta RCA"
+    "🧑‍💼 Consulta RCA",
+    "📥 Consulta de NF SERVIÇO TCG e MCD"
 ])
 
 @st.cache_data(ttl=0)
