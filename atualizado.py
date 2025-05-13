@@ -149,12 +149,35 @@ with abas[4]:
 
 # Aba 6: Consulta de Pedidos
 # Aba 6: Consulta de Pedidos
+# Aba 6: Consulta de Pedidos
 with abas[5]:
     st.subheader("Consulta de Pedidos")
     try:
+        # Carrega os dados de pedidos
         dados_pedidos = carregar_dados_google_sheet(sheet_id_pedidos, 'Página1')
         st.success("Planilha de pedidos carregada com sucesso.")
 
+        # Carrega os dados de coordenadores
+        sheet_id_coordenadores = '1Y-zO5l5b1r84XU6rYgWkXUDbn2tkYRWWgDAh1dPtkUE'
+        dados_coordenadores = carregar_dados_google_sheet(sheet_id_coordenadores, 'Página1')
+
+        # Normaliza os nomes das colunas
+        dados_coordenadores.columns = dados_coordenadores.columns.str.strip().str.upper()
+
+        # Garante que os nomes corretos existam e renomeia se necessário
+        if 'CODIGO' in dados_coordenadores.columns and 'COORDENADOR' in dados_coordenadores.columns:
+            dados_coordenadores = dados_coordenadores.rename(columns={'CODIGO': 'Repr'})
+        else:
+            st.warning("Colunas 'CODIGO' e 'COORDENADOR' não encontradas na planilha de coordenadores.")
+
+        # Converte para string para garantir merge correto
+        dados_pedidos['Repr'] = dados_pedidos['Repr'].astype(str)
+        dados_coordenadores['Repr'] = dados_coordenadores['Repr'].astype(str)
+
+        # Faz o merge para adicionar o nome do coordenador
+        dados_pedidos = pd.merge(dados_pedidos, dados_coordenadores[['Repr', 'COORDENADOR']], on='Repr', how='left')
+
+        # Campos de entrada
         col1, col2, col3 = st.columns(3)
         with col1:
             repr_input = st.text_input("Digite o código do Representante:", key="repr")
@@ -172,11 +195,14 @@ with abas[5]:
             ]
 
             if not resultado.empty:
+                # Renomeia a coluna de coordenador para exibição
+                resultado = resultado.rename(columns={'COORDENADOR': 'Nome do Coordenador'})
                 st.dataframe(resultado)
             else:
                 st.warning("Nenhum pedido encontrado com esses dados.")
     except Exception as e:
-        st.error(f"Erro ao carregar pedidos: {e}")
+        st.error(f"Erro ao carregar dados de pedidos ou coordenadores: {e}")
+
 
 
 
