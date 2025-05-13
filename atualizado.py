@@ -12,6 +12,7 @@ sheet_id_cargas_dev = '1pUFv1VzcOI9-u0miYW1lfqDMlKHUbo0S2lq62GG3KtQ'
 sheet_id_pedidos = '1xlJhN6PRrd297dkKbxz9W9TVL_-HK5UeGjuKxm8-Rbg'
 sheet_id_produtos = '1PzkzkHwT5vv4u71KCNXpF-TFClzYKNngWHg13_wOR6o'
 sheet_id_produtosmcd = '1dxvHYgcC8x53li2vCmVY8VVlighWSa4dAjHx7gQPF-0'
+sheet_id_notasnfs = '1QHRZp3HlqbJxOkDNSk0lP0Y0xBmA0sbhdgTZR2q4Wu4'
 
 st.title("Consultas TRIUNFANTE")
 
@@ -22,6 +23,7 @@ abas = st.tabs([
     "🚚 Consulta de Cargas",
     "📥 MOTIVOS DE DEVOLUÇÕES TCG e MCD",
     "🧾 Consulta de Pedidos TCG e MCD",
+    "📥 Consulta de NF SERVIÇO TCG e MCD",
     "🧑‍💼 Consulta RCA"
 ])
 
@@ -198,6 +200,21 @@ with abas[6]:
                 st.warning("Nenhum representante encontrado com esse código.")
     except Exception as e:
         st.error(f"Erro ao carregar dados de representantes: {e}")
+
+with abas[7]:
+    st.subheader("Consulta de NF DE SERVIÇO")
+    try:
+        dados_entradas = carregar_dados_google_sheet(sheet_id_notasnfs, 'Página1')
+        st.success("Planilha de entradas carregada com sucesso.")
+        consulta_nota = st.text_input('Digite o número da Nota:', key="Nr.Nota")
+        if consulta_nota:
+            resultado = dados_entradas[dados_entradas['Nr.Nota'].astype(str) == consulta_nota.strip()]
+            if not resultado.empty:
+                st.dataframe(resultado)
+            else:
+                st.warning("Nenhum resultado encontrado.")
+    except Exception as e:
+        st.error(f"Erro ao carregar dados de entradas: {e}")
 
 
 
