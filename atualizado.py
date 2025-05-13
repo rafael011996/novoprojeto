@@ -179,7 +179,7 @@ with abas[5]:
     except Exception as e:
         st.error(f"Erro ao carregar pedidos: {e}")
 
-  with abas[6]
+  with abas[6]:
       st.subheader("Consulta de Representantes (RCA)")
     
     sheet_id_rca = "1Y-zO5l5b1r84XU6rYgWkXUDbn2tkYRWWgDAh1dPtkUE"
