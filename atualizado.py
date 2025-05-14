@@ -132,34 +132,42 @@ with abas[4]:
     else:
         st.success("Planilha de devoluções carregada com sucesso.")
         
-        # Opções de filtro
-        st.markdown("**Escolha o tipo de busca:**")
-        tipo_busca = st.radio("Tipo de Busca", ["Código de Devolução", "Número da NF"], horizontal=True)
+        # --- Busca por Código de Devolução ---
+        st.markdown("**Buscar por código de devolução (após 'DEV-'):**")
+        col1, col2 = st.columns([1, 5])
+        with col1:
+            st.text_input("Prefixo", value="DEV-", disabled=True, label_visibility="collapsed")
+        with col2:
+            numero_codigo = st.text_input("Código", key="codigo_dev", label_visibility="collapsed")
 
-        if tipo_busca == "Código de Devolução":
-            st.markdown("**Digite o número do código de devolução (após 'DEV-'):**")
-            col1, col2 = st.columns([1, 5])
-            with col1:
-                st.text_input("Prefixo", value="DEV-", disabled=True, label_visibility="collapsed")
-            with col2:
-                numero_codigo = st.text_input("Código", key="codigo_dev", label_visibility="collapsed")
+        resultado_codigo = pd.DataFrame()
+        if numero_codigo:
+            codigo_completo = f"DEV-{numero_codigo.strip()}"
+            resultado_codigo = dados_motivos[dados_motivos.iloc[:, 9].astype(str) == codigo_completo]
 
-            if numero_codigo:
-                codigo_completo = f"DEV-{numero_codigo.strip()}"
-                resultado = dados_motivos[dados_motivos.iloc[:, 9].astype(str) == codigo_completo]
+        # --- Busca por Número da NF ---
+        st.markdown("**Buscar por número da nota fiscal (NF):**")
+        numero_nf = st.text_input("Número da NF", key="nf_input")
 
-        elif tipo_busca == "Número da NF":
-            numero_nf = st.text_input("Digite o número da nota fiscal (NF):", key="nf_input")
-            if numero_nf:
-                resultado = dados_motivos[dados_motivos.iloc[:, 5].astype(str) == numero_nf.strip()]
+        resultado_nf = pd.DataFrame()
+        if numero_nf:
+            resultado_nf = dados_motivos[dados_motivos.iloc[:, 5].astype(str) == numero_nf.strip()]
 
-        # Mostrar resultados, se existir
-        if 'resultado' in locals():
-            colunas_exibir = list(dados_motivos.columns[:9])
-            if not resultado.empty:
-                st.dataframe(resultado[colunas_exibir])
-            else:
-                st.warning("Nenhum resultado encontrado.")
+        # --- Exibir Resultados ---
+        colunas_exibir = list(dados_motivos.columns[:9])
+
+        if not resultado_codigo.empty:
+            st.markdown("**Resultado da busca por código de devolução:**")
+            st.dataframe(resultado_codigo[colunas_exibir])
+        elif numero_codigo:
+            st.warning("Nenhum resultado encontrado para o código informado.")
+
+        if not resultado_nf.empty:
+            st.markdown("**Resultado da busca por número da NF:**")
+            st.dataframe(resultado_nf[colunas_exibir])
+        elif numero_nf:
+            st.warning("Nenhum resultado encontrado para a NF informada.")
+
 
 
 # Aba 6: Consulta de Pedidos
