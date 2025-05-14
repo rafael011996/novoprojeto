@@ -132,23 +132,35 @@ with abas[4]:
     else:
         st.success("Planilha de devoluções carregada com sucesso.")
         
-        st.markdown("**Digite o número do código de devolução (após 'DEV-'):**")
-        col1, col2 = st.columns([1, 5])
-        
-        with col1:
-            st.text_input("Prefixo", value="DEV-", disabled=True, label_visibility="collapsed")
-        with col2:
-            numero_codigo = st.text_input("Código", key="codigo_dev", label_visibility="collapsed")
+        # Opções de filtro
+        st.markdown("**Escolha o tipo de busca:**")
+        tipo_busca = st.radio("Tipo de Busca", ["Código de Devolução", "Número da NF"], horizontal=True)
 
-        if numero_codigo:
-            codigo_completo = f"DEV-{numero_codigo.strip()}"
-            resultado = dados_motivos[dados_motivos.iloc[:, 9].astype(str).str.contains(codigo_completo, na=False)]
-            colunas_exibir = list(resultado.columns[:9])
-            
+        if tipo_busca == "Código de Devolução":
+            st.markdown("**Digite o número do código de devolução (após 'DEV-'):**")
+            col1, col2 = st.columns([1, 5])
+            with col1:
+                st.text_input("Prefixo", value="DEV-", disabled=True, label_visibility="collapsed")
+            with col2:
+                numero_codigo = st.text_input("Código", key="codigo_dev", label_visibility="collapsed")
+
+            if numero_codigo:
+                codigo_completo = f"DEV-{numero_codigo.strip()}"
+                resultado = dados_motivos[dados_motivos.iloc[:, 9].astype(str) == codigo_completo]
+
+        elif tipo_busca == "Número da NF":
+            numero_nf = st.text_input("Digite o número da nota fiscal (NF):", key="nf_input")
+            if numero_nf:
+                resultado = dados_motivos[dados_motivos.iloc[:, 5].astype(str) == numero_nf.strip()]
+
+        # Mostrar resultados, se existir
+        if 'resultado' in locals():
+            colunas_exibir = list(dados_motivos.columns[:9])
             if not resultado.empty:
                 st.dataframe(resultado[colunas_exibir])
             else:
                 st.warning("Nenhum resultado encontrado.")
+
 
 # Aba 6: Consulta de Pedidos
 # Aba 6: Consulta de Pedidos
