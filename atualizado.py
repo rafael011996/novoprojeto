@@ -142,7 +142,7 @@ with abas[4]:
 
         if numero_codigo:
             codigo_completo = f"DEV-{numero_codigo.strip()}"
-            resultado = dados_motivos[dados_motivos.iloc[:, 9].astype(str).str.contains(codigo_completo, na=False)]
+            resultado = dados_motivos[dados_motivos.iloc[:, 5, 9].astype(str).str.contains(codigo_completo, na=False)]
             colunas_exibir = list(resultado.columns[:9])
             
             if not resultado.empty:
