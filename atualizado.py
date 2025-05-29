@@ -67,7 +67,7 @@ with abas[1]:
     dados_produtos = carregar_dados_google_sheet(sheet_id_produtos, 'Página1')
     if not dados_produtos.empty:
         st.success("Planilha de produtos carregada com sucesso.")
-        dados_produtos = dados_produtos[['Produto', 'Produto Fornecedor', 'Descricao', 'Codigo Getin', 'Saldo', 'Multiplo', 'Fator Conversao', 'Data Ult. Compra', 'NCM', 'CEST', '% IPI']]
+        dados_produtos = dados_produtos[['Produto', 'Produto Fornecedor', 'Descricao', 'Codigo Getin', 'Saldo', 'Multiplo', 'Fator Conversao', 'Data Ult. Compra', 'NCM', 'CEST', '%MVA S', '% IPI']]
         consulta_produto = st.text_input('Digite o nome, código ou descrição do produto:', key="produto_tcg")
         if consulta_produto:
             resultado = dados_produtos[dados_produtos.apply(lambda row: consulta_produto.lower() in str(row).lower(), axis=1)]
@@ -84,7 +84,7 @@ with abas[2]:
     dados_produtos = carregar_dados_google_sheet(sheet_id_produtosmcd, 'Página1')
     if not dados_produtos.empty:
         st.success("Planilha de produtos carregada com sucesso.")
-        dados_produtos = dados_produtos[['Produto', 'Produto Fornecedor', 'Descricao', 'Codigo Getin', 'Saldo', 'Multiplo', 'Fator Conversao', 'Data Ult. Compra', 'NCM', 'CEST', '% IPI']]
+        dados_produtos = dados_produtos[['Produto', 'Produto Fornecedor', 'Descricao', 'Codigo Getin', 'Saldo', 'Multiplo', 'Fator Conversao', 'Data Ult. Compra', 'NCM', 'CEST', '%MVA S', '% IPI']]
         consulta_produto = st.text_input('Digite o nome, código ou descrição do produto:', key="produto_mcd")
         if consulta_produto:
             resultado = dados_produtos[dados_produtos.apply(lambda row: consulta_produto.lower() in str(row).lower(), axis=1)]
