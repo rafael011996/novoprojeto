@@ -99,7 +99,7 @@ with abas[2]:
 with abas[3]:
     st.header("🔍 Consulta de Cargas")
 
-    dados_cargas = carregar_dados_cargas(sheet_id_cargas_tcg, ['ABRIL/2025', 'MAIO/2025'])
+    dados_cargas = carregar_dados_cargas(sheet_id_cargas_tcg, ['ABRIL/2025', 'MAIO/2025', 'JUNHO/2025', 'JULHO/2025'])
 
     if dados_cargas.empty:
         st.error("Erro ao carregar dados de cargas.")
