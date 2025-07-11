@@ -226,7 +226,7 @@ with abas[7]:
     try:
         dados_entradas = carregar_dados_google_sheet(sheet_id_notasnfs, 'Página1')
         st.success("Planilha de entradas carregada com sucesso.")
-        consulta_nota = st.text_input('Digite o número da Nota:', key="Nr.Nota","Cnpj/CPF","Vlr.Contabil")
+        consulta_nota = st.text_input('Digite o número da Nota:', key="Nr.Nota")
         if consulta_nota:
             resultado = dados_entradas[dados_entradas['Nr.Nota','Cnpj/CPF','Vlr.Contabil'].astype(str) == consulta_nota.strip()]
             if not resultado.empty:
